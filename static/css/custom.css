@@ -1,0 +1,11 @@
+body::-webkit-scrollbar { display:none; height:0 !important; width: 0 !important;
+    padding: 100px;}
+body::-webkit-scrollbar:horizontal { height:0 !important; width: 0!important;}
+
+#contextual-window {
+    top: 50px;
+    background: #FFF;
+    position:fixed;
+    z-index: 2;
+    border-radius: 5px;
+}
