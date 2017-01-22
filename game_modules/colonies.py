@@ -22,7 +22,7 @@ class Colony:
 		}
 
 		self.construction_queue = [
-			ConstructionProject('mines', 10, constants.mines_cost, 50, 100)
+			ConstructionProject('mines', 10, constants.MINES_COST, 50, 100)
 		]
 
 		# Colony Storage

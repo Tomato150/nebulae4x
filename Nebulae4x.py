@@ -61,9 +61,13 @@ def close_db(error):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-	stars = flask_handler.get_stars()
-	return render_template( 'index.html', stars=json.dumps(stars, default=to_json) )
+	return render_template('index.html')
 
+
+@app.route('/get_stars', methods=['GET'])
+def get_stars():
+	stars = flask_handler.get_stars()
+	return json.dumps(stars, default=to_json)
 
 if __name__ == '__main__':
 	app.run()

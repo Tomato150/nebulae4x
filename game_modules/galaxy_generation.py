@@ -1,4 +1,6 @@
-from random import randint, random, uniform
+from game_data.constants import galaxy_generation_constants as constants
+
+from random import randint, random, uniform, choice
 import math
 
 
@@ -54,7 +56,7 @@ class Galaxy:
 				star_y = int(math.sin(angle) * distance * self.size_of_canvas / 2)
 
 				# Random Offset
-				if False:
+				if inx % self.x_y_rand_offset == 0:
 					offset_star_x = 20 * self.x_y_rand_offset * uniform(-1, 1)
 					offset_star_y = 20 * self.x_y_rand_offset * uniform(-1, 1)
 				else:
@@ -123,6 +125,11 @@ class Star:
 	def __init__(self, x, y):
 		# System Location Information
 		self.coordinates = [int(x), int(y)]
+
+		# Star type information
+		star = choice(constants.STARS[0])
+		self.star_type = star[0]
+		self.file_path = choice(star[1])
 
 		# System Contents information:
 		self.planets = []

@@ -1,3 +1,3 @@
-mines_cost = {
+MINES_COST = {
 	'building_materials': 100
 }

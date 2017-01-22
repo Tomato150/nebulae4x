@@ -60,12 +60,11 @@
 
     <script>
         $(document).ready(function () {
-            // vars for the sprites
-            var stars = {{ stars|safe }};
+            var stars;
             var scroll_factor = 1.0;
             var contextual_window = $('#contextual-window');
 
-            var star_sprite;
+            contextual_window.height($(window).height() - 100).width(contextual_window.height() / 1.6);
 
             // Init short hand
             var Container = PIXI.Container,
@@ -77,27 +76,55 @@
             // Create renderer to canvas object and stage for sprites
             var renderer = autoDetectRenderer(6000, 6000, {view: $('#canvas-trial')[0]}),
                 stage = new Container(),
-                container = new Container();
+                stage_container = new Container(),
+                small_star_container = new Container(),
+                large_star_container = new Container();
 
-            stage.addChild(container);
+            // LEAVE AS IT IS, ONLY WORKS LIKE THIS FOR SOME REASON
+            stage_container.addChild(large_star_container);
+            stage_container.addChild(small_star_container);
+            stage.addChild(stage_container);
+            // CAN TOUCH STUFF NOW.
 
-            // Load images for later use
-            loader
-                    .add("/static/images/white.png")
-                    .load(setup);
+            $.ajax({
+                type: 'GET',
+                url: '/get_stars',
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function (server_data) {
+                    stars = server_data;
+                    loader
+                        .add("/static/images/white.png")
+                        .add("/static/images/stars/B_D_1.png")
+                        .add("/static/images/stars/B_G_1.png")
+                        .add("/static/images/stars/B_M_1.png")
+                        .add("/static/images/stars/R_D_1.png")
+                        .add("/static/images/stars/R_G_1.png")
+                        .add("/static/images/stars/R_M_1.png")
+                        .add("/static/images/stars/R_SG_1.png")
+                        .add("/static/images/stars/Y_M_1.png")
+                        .load(setup);
+                },
+                error: function (xhr, ajaxOptions, thrownError) {alert('Error: Unable to load page: ' + thrownError);}
+            });
 
-            // Create sprites and create initial stage
             function setup() {
-
                 for (var star_index in stars) {
-                    star_sprite = new Sprite(
+                    var star_sprite = new Sprite(
                         resources["/static/images/white.png"].texture
                     );
                     var star = stars[star_index];
                     star_sprite.x = star.coordinates[0] + 3000;
                     star_sprite.y = star.coordinates[1] + 3000;
 
-                    container.addChild(star_sprite);
+                    var large_star_sprite = new Sprite(
+                        resources[star.file_path].texture
+                    );
+                    large_star_sprite.x = star.coordinates[0] * 32 + (3000 * 32);
+                    large_star_sprite.y = star.coordinates[1] * 32 + (3000 * 32);
+
+                    small_star_container.addChild(star_sprite);
+                    large_star_container.addChild(large_star_sprite);
                 }
                 renderLoop();
             }
@@ -105,10 +132,16 @@
             function renderLoop() {
                 requestAnimationFrame(renderLoop);
 
+                if (scroll_factor < 8) {
+                    small_star_container.visible = true;
+                    large_star_container.visible = false;
+                } else {
+                    small_star_container.visible = false;
+                    large_star_container.visible = true;
+                }
+
                 renderer.render(stage)
             }
-
-            contextual_window.height($(window).height() - 100).width(contextual_window.height() / 1.6);
 
             $('#slide').on('click', function () {
                 var contextual_window = $('#contextual-window');
@@ -121,44 +154,44 @@
 
             $(window).on("mousewheel", function (e) {
                 var old_scroll_factor = scroll_factor;
+                x = e.pageX;
+                y = e.pageY;
                 if (e.originalEvent.wheelDelta >= 0) {
                     // Scrolled up
                     scroll_factor = Math.min(32, scroll_factor + 1);
-                     if (scroll_factor != old_scroll_factor) {
-                         old_scroll_y += 3000;
-                         old_scroll_x += 3000;
+                    if (scroll_factor != old_scroll_factor) {
+                        console.log('Container width: ' + large_star_container.width);
+                        container_pan_x += ((container_pan_x + x) / large_star_container.width) * 6000;
+                        container_pan_y += ((container_pan_y + y) / large_star_container.height) * 6000;
                      }
                 } else {
                     // Scrolled Down
                     scroll_factor =  Math.max(1, scroll_factor - 1);
                     if (scroll_factor != old_scroll_factor) {
-                        old_scroll_y -= 3000;
-                        old_scroll_x -= 3000;
+                        container_pan_x -= ((container_pan_x + x) / large_star_container.width) * 6000;
+                        container_pan_y -= ((container_pan_y + y) / large_star_container.height) * 6000;
                     }
                 }
-                container.scale.x = scroll_factor;
-                container.scale.y = scroll_factor;
 
-                x = e.pageX;
-                y = e.pageY;
-                top = $(this).scrollTop();
-                left = $(this).scrollLeft();
-                var newX = e.pageX;
-                var newY = e.pageY;
-
-                scroll_x = left - newX + x;
-                scroll_y = top - newY + y;
-                container.x = -(old_scroll_x + scroll_x);
-                container.y = -(old_scroll_y + scroll_y);
+                small_star_container.scale.x = scroll_factor;
+                small_star_container.scale.y = scroll_factor;
+                large_star_container.scale.x = scroll_factor / 32;
+                large_star_container.scale.y = scroll_factor / 32;
+                small_star_container.x = -(container_pan_x);
+                small_star_container.y = -(container_pan_y);
+                large_star_container.x = -(container_pan_x);
+                large_star_container.y = -(container_pan_y);
+                console.log(-(container_pan_x + mouse_scroll_x));
+                console.log(-(container_pan_y + mouse_scroll_y));
                 console.log(scroll_factor);
             });
 
             // DragScroll
             var x,y,top,left,down,
-                    old_scroll_x = 0,
-                    old_scroll_y = 0,
-                    scroll_x = 0,
-                    scroll_y = 0;
+                    container_pan_x = 0,
+                    container_pan_y = 0,
+                    mouse_scroll_x = 0,
+                    mouse_scroll_y = 0;
 
             $('body').on("mousedown", function (e) {
                 e.preventDefault();
@@ -174,20 +207,21 @@
                     var newX = e.pageX;
                     var newY = e.pageY;
 
-                    scroll_x = left - newX + x;
-                    scroll_y = top - newY + y;
-                    console.log('nexX: ' + newX);
-                    console.log('Container x: ' + -(old_scroll_x + scroll_x));
-                    container.x = -(old_scroll_x + scroll_x);
-                    console.log('Container Y: ' + -(old_scroll_y + scroll_y));
-                    container.y = -(old_scroll_y + scroll_y);
+                    mouse_scroll_x = left - newX + x;
+                    mouse_scroll_y = top - newY + y;
+                    console.log('Container x: ' + -(container_pan_x + mouse_scroll_x));
+                    small_star_container.x = -(container_pan_x + mouse_scroll_x);
+                    large_star_container.x = -(container_pan_x + mouse_scroll_x);
+                    console.log('Container Y: ' + -(container_pan_y + mouse_scroll_y));
+                    small_star_container.y = -(container_pan_y + mouse_scroll_y);
+                    large_star_container.y = -(container_pan_y + mouse_scroll_y);
                 }
             });
 
             $("body").on("mouseup", function (e) {
                 down = false;
-                old_scroll_x = (old_scroll_x + scroll_x);
-                old_scroll_y = (old_scroll_y + scroll_y);
+                container_pan_x = (container_pan_x + mouse_scroll_x);
+                container_pan_y = (container_pan_y + mouse_scroll_y);
             });
         })
     </script>
