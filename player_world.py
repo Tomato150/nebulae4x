@@ -14,6 +14,9 @@ class PlayerWorld:
 	def get_stars(self):
 		return self.galaxy.get_stars()
 
+	def get_canvas_size(self):
+		return self.galaxy.get_canvas_size()
+
 	def game_loop(self):
 		pass
 

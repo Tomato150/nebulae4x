@@ -66,8 +66,9 @@ def index():
 
 @app.route('/get_stars', methods=['GET'])
 def get_stars():
-	stars = flask_handler.get_stars()
-	return json.dumps(stars, default=to_json)
+	stars = json.dumps(flask_handler.get_stars(), default=to_json)
+	canvas_size = flask_handler.get_canvas_size()
+	return '{"stars": ' + stars + ',"canvas_size":' + str(canvas_size) + '}'
 
 if __name__ == '__main__':
 	app.run()

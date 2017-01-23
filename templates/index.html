@@ -26,20 +26,44 @@
             <hr>
 
             <ul class="nav nav-pills">
-                <li class="nav-item"><a class="nav-link active" data-toggle="tab" role="tab" href="#production-tab">Production</a></li>
+                <li class="nav-item"><a class="nav-link active" data-toggle="tab" role="tab" href="#overview-tab">Overview</a></li>
+                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" href="#production-tab">Production</a></li>
                 <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" href="#fleet-tab">Fleets</a></li>
+                <!--<li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" href="#"></a></li>-->
             </ul>
 
             <hr>
 
             <div class="tab-content">
-                <div class="tab-pane active" id="production-tab" role="tabpanel">
-                    <h1>product</h1>
-                    <hr>
-                    <h1 id="colony"></h1>
+                <div id="overview-tab" class="tab-pane active" role="tabpanel">
+                    <h1>Overview</h1>
+                    <h2>Planets</h2>
+                    <div id="overview-tab-colonies" role="tablist">
+
+                        <div class="card">
+                            <div id="earth-heading" class="card-header" role="tab">
+                                <h5 class="mb-0">
+                                    <a data-toggle="collapse" data-parent="overview-tab-colonies" href="#earth-body">Earth</a>
+                                </h5>
+                            </div>
+
+                            <div id="earth-body" class="collapse show" role="tabpanel" aria-labelledby="earth-heading">
+                                <div class="card-block">
+                                    <p>Earth Filler Text.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="production-tab" role="tabpanel">
+                    <h1>Production</h1>
                 </div>
                 <div class="tab-pane" id="fleet-tab" role="tabpanel">
-                    <h1>flet</h1>
+                    <h1>Fleet</h1>
                 </div>
             </div>
         <!-- Wrapper Div -->
@@ -48,7 +72,7 @@
 
     <div id="viewport" class="" style="position: fixed; overflow: hidden; height: 100vh; width: 100vw;">
         <button id="slide" class="btn btn-primary" style="top: 90%; left: 90%; position: fixed;">slide</button>
-        <canvas id="canvas-trial" height="6000" width="6000" ></canvas>
+        <canvas id="canvas"></canvas>
     </div>
 
     <!-- Bootstrap Dependencies -->
@@ -66,11 +90,18 @@
 
     <script>
         $(document).ready(function () {
-            var stars;
-            var scroll_factor = 1.0;
-            var contextual_window = $('#contextual-window');
+            var stars,
+                canvas_size = 6000,
+                scroll_factor = 1,
+                contextual_window = $('#contextual-window'),
+                canvas = $('#canvas');
 
-            contextual_window.height($(window).height() - 100).width(contextual_window.height() / 1.6);
+            // DragScroll
+            var mouse_x, mouse_y, top, left, down, moved,
+                container_pan_x = 0,
+                container_pan_y = 0,
+                mouse_scroll_x = 0,
+                mouse_scroll_y = 0;
 
             // Init short hand
             var Container = PIXI.Container,
@@ -79,8 +110,37 @@
                 resources = PIXI.loader.resources,
                 Sprite = PIXI.Sprite;
 
+            contextual_window.height($(window).height() - 100).width(contextual_window.height() / 1.6);
+
+            $.ajax({
+                type: 'GET',
+                url: '/get_stars',
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function (server_data) {
+                    stars = server_data['stars'];
+                    canvas_size = server_data['canvas_size'];
+                    loader.add("/static/images/white.png")
+                            .add("/static/images/stars/B_D_1.png")
+                            .add("/static/images/stars/B_G_1.png")
+                            .add("/static/images/stars/B_M_1.png")
+                            .add("/static/images/stars/R_D_1.png")
+                            .add("/static/images/stars/R_G_1.png")
+                            .add("/static/images/stars/R_M_1.png")
+                            .add("/static/images/stars/R_SG_1.png")
+                            .add("/static/images/stars/Y_M_1.png")
+                            .load(setup);
+                },
+                error: function (xhr, ajaxOptions, thrownError) {alert('Error: Unable to load page: ' + thrownError);}
+            });
+
+            canvas.attr({
+                'height': canvas_size,
+                'width': canvas_size
+            });
+
             // Create renderer to canvas object and stage for sprites
-            var renderer = autoDetectRenderer(6000, 6000, {view: $('#canvas-trial')[0]}),
+            var renderer = autoDetectRenderer(canvas_size, canvas_size, {view: canvas[0]}),
                 stage = new Container(),
                 stage_container = new Container(),
                 small_star_container = new Container(),
@@ -90,29 +150,7 @@
             stage_container.addChild(large_star_container);
             stage_container.addChild(small_star_container);
             stage.addChild(stage_container);
-            // CAN TOUCH STUFF NOW.
-
-            $.ajax({
-                type: 'GET',
-                url: '/get_stars',
-                dataType: 'json',
-                contentType: 'application/json',
-                success: function (server_data) {
-                    stars = server_data;
-                    loader
-                        .add("/static/images/white.png")
-                        .add("/static/images/stars/B_D_1.png")
-                        .add("/static/images/stars/B_G_1.png")
-                        .add("/static/images/stars/B_M_1.png")
-                        .add("/static/images/stars/R_D_1.png")
-                        .add("/static/images/stars/R_G_1.png")
-                        .add("/static/images/stars/R_M_1.png")
-                        .add("/static/images/stars/R_SG_1.png")
-                        .add("/static/images/stars/Y_M_1.png")
-                        .load(setup);
-                },
-                error: function (xhr, ajaxOptions, thrownError) {alert('Error: Unable to load page: ' + thrownError);}
-            });
+            // Fine to touch from here onwwards
 
             function setup() {
                 for (var star_index in stars) {
@@ -120,14 +158,14 @@
                         resources["/static/images/white.png"].texture
                     );
                     var star = stars[star_index];
-                    star_sprite.x = star.coordinates[0] + 3000;
-                    star_sprite.y = -star.coordinates[1] + 3000;
+                    star_sprite.x = star.coordinates[0] + (canvas_size / 2);
+                    star_sprite.y = -star.coordinates[1] + (canvas_size / 2);
 
                     var large_star_sprite = new Sprite(
                         resources[star.file_path].texture
                     );
-                    large_star_sprite.x = star.coordinates[0] * 32 + (3000 * 32);
-                    large_star_sprite.y = -star.coordinates[1] * 32 + (3000 * 32);
+                    large_star_sprite.x = star.coordinates[0] * 32 + ((canvas_size / 2) * 32);
+                    large_star_sprite.y = -star.coordinates[1] * 32 + ((canvas_size / 2) * 32);
 
                     small_star_container.addChild(star_sprite);
                     large_star_container.addChild(large_star_sprite);
@@ -157,15 +195,15 @@
                     // Scrolled up
                     scroll_factor = Math.min(32, scroll_factor + 1);
                     if (scroll_factor != old_scroll_factor) {
-                        container_pan_x += ((container_pan_x + mouse_x) / (6000 * (scroll_factor - 1))) * 6000;
-                        container_pan_y += ((container_pan_y + mouse_y) / (6000 * (scroll_factor - 1))) * 6000;
+                        container_pan_x += ((container_pan_x + mouse_x) / (canvas_size * (scroll_factor - 1))) * canvas_size;
+                        container_pan_y += ((container_pan_y + mouse_y) / (canvas_size * (scroll_factor - 1))) * canvas_size;
                      }
                 } else {
                     // Scrolled Down
                     scroll_factor =  Math.max(1, scroll_factor - 1);
                     if (scroll_factor != old_scroll_factor) {
-                        container_pan_x -= ((container_pan_x + mouse_x) / (6000 * (scroll_factor + 1))) * 6000;
-                        container_pan_y -= ((container_pan_y + mouse_y) / (6000 * (scroll_factor + 1))) * 6000;
+                        container_pan_x -= ((container_pan_x + mouse_x) / (canvas_size * (scroll_factor + 1))) * canvas_size;
+                        container_pan_y -= ((container_pan_y + mouse_y) / (canvas_size * (scroll_factor + 1))) * canvas_size;
                     }
                 }
                 small_star_container.scale.x = scroll_factor;
@@ -178,33 +216,27 @@
                 large_star_container.y = -(container_pan_y);
             });
 
-            // DragScroll
-            var mouse_x,mouse_y,top,left,down,moved,
-                    container_pan_x = 0,
-                    container_pan_y = 0,
-                    mouse_scroll_x = 0,
-                    mouse_scroll_y = 0;
-
             $(window).on("mousedown", function (e) {
                 e.preventDefault();
+                // Left Mouse
                 if (e.which == 1) {
-                    // Left Mouse
                     mouse_x = e.pageX;
                     mouse_y = e.pageY;
-                    var x_coord = Math.floor((container_pan_x + mouse_x) / scroll_factor - 3000);
-                    var y_coord = -Math.floor((container_pan_y + mouse_y) / scroll_factor - 3000);
+                    var x_coord = Math.floor((container_pan_x + mouse_x) / scroll_factor - (canvas_size / 2));
+                    var y_coord = -Math.floor((container_pan_y + mouse_y) / scroll_factor - (canvas_size / 2));
                     console.log(x_coord + ' : ' + y_coord);
                     for (var star_inx in stars) {
                         var star = stars[star_inx];
                         if (star.coordinates[0] == x_coord && star.coordinates[1] ==  y_coord) {
                             $('#star-system-name').html(
-                                    star.name +
-                                    ' <small id="star-system-coordinates" class="text-muted">' + '(' + star.coordinates[0] + ', ' + star.coordinates[1] + ')' + '</small>')
-                            ;
+                                star.name +
+                                ' <small id="star-system-coordinates" class="text-muted">' + '(' + star.coordinates[0] + ', ' + star.coordinates[1] + ')' + '</small>'
+                            );
+
                         }
                     }
-                } else if (e.which == 2) {
-                    // Middle Mouse
+                } // Middle Mouse
+                else if (e.which == 2) {
                     moved = false;
                     down = true;
                     mouse_x = e.pageX;

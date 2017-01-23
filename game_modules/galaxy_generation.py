@@ -133,6 +133,9 @@ class Galaxy:
 	def get_stars(self):
 		return self.stars
 
+	def get_canvas_size(self):
+		return self.size_of_canvas
+
 
 class Star:
 	def __init__(self, x, y, **kwargs):
