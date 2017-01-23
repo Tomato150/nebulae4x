@@ -12,7 +12,7 @@
     <link href="/static/css/custom.css" rel="stylesheet">
 
 </head>
-<body >
+<body>
 
     <!-- Hidden Images -->
     <div hidden>
@@ -88,196 +88,24 @@
     <!-- Personally chosen plugins -->
     <script src="/static/js/pixi.min.js"></script>
 
+    <script src="/static/js/world.js"></script>
+    <script src="/static/js/handlers.js"></script>
+
     <script>
         $(document).ready(function () {
-            var stars,
-                canvas_size = 6000,
-                scroll_factor = 1,
-                contextual_window = $('#contextual-window'),
-                canvas = $('#canvas');
+            var world = world_object;
+            var handlers = handler_object;
+            world.init();
 
-            // DragScroll
-            var mouse_x, mouse_y, top, left, down, moved,
-                container_pan_x = 0,
-                container_pan_y = 0,
-                mouse_scroll_x = 0,
-                mouse_scroll_y = 0;
+            $(window).on("mousewheel", function (e) {handlers.mouse_scroll(e, world);});
 
-            // Init short hand
-            var Container = PIXI.Container,
-                autoDetectRenderer = PIXI.autoDetectRenderer,
-                loader = PIXI.loader,
-                resources = PIXI.loader.resources,
-                Sprite = PIXI.Sprite;
+            $(window).on("mousedown", function (e) {handlers.mouse_click(e, world);} );
 
-            contextual_window.height($(window).height() - 100).width(contextual_window.height() / 1.6);
+            $(window).on("mousemove", function (e) {handlers.mouse_move(e, world);} );
 
-            $.ajax({
-                type: 'GET',
-                url: '/get_stars',
-                dataType: 'json',
-                contentType: 'application/json',
-                success: function (server_data) {
-                    stars = server_data['stars'];
-                    canvas_size = server_data['canvas_size'];
-                    loader.add("/static/images/white.png")
-                            .add("/static/images/stars/B_D_1.png")
-                            .add("/static/images/stars/B_G_1.png")
-                            .add("/static/images/stars/B_M_1.png")
-                            .add("/static/images/stars/R_D_1.png")
-                            .add("/static/images/stars/R_G_1.png")
-                            .add("/static/images/stars/R_M_1.png")
-                            .add("/static/images/stars/R_SG_1.png")
-                            .add("/static/images/stars/Y_M_1.png")
-                            .load(setup);
-                },
-                error: function (xhr, ajaxOptions, thrownError) {alert('Error: Unable to load page: ' + thrownError);}
-            });
+            $(window).on("mouseup", function (e) {handlers.mouse_click_up(e, world);} );
 
-            canvas.attr({
-                'height': canvas_size,
-                'width': canvas_size
-            });
-
-            // Create renderer to canvas object and stage for sprites
-            var renderer = autoDetectRenderer(canvas_size, canvas_size, {view: canvas[0]}),
-                stage = new Container(),
-                stage_container = new Container(),
-                small_star_container = new Container(),
-                large_star_container = new Container();
-
-            // LEAVE AS IT IS, ONLY WORKS LIKE THIS FOR SOME REASON
-            stage_container.addChild(large_star_container);
-            stage_container.addChild(small_star_container);
-            stage.addChild(stage_container);
-            // Fine to touch from here onwwards
-
-            function setup() {
-                for (var star_index in stars) {
-                    var star_sprite = new Sprite(
-                        resources["/static/images/white.png"].texture
-                    );
-                    var star = stars[star_index];
-                    star_sprite.x = star.coordinates[0] + (canvas_size / 2);
-                    star_sprite.y = -star.coordinates[1] + (canvas_size / 2);
-
-                    var large_star_sprite = new Sprite(
-                        resources[star.file_path].texture
-                    );
-                    large_star_sprite.x = star.coordinates[0] * 32 + ((canvas_size / 2) * 32);
-                    large_star_sprite.y = -star.coordinates[1] * 32 + ((canvas_size / 2) * 32);
-
-                    small_star_container.addChild(star_sprite);
-                    large_star_container.addChild(large_star_sprite);
-                }
-                renderLoop();
-            }
-
-            function renderLoop() {
-                requestAnimationFrame(renderLoop);
-
-                if (scroll_factor < 8) {
-                    small_star_container.visible = true;
-                    large_star_container.visible = false;
-                } else {
-                    small_star_container.visible = false;
-                    large_star_container.visible = true;
-                }
-
-                renderer.render(stage)
-            }
-
-            $(window).on("mousewheel", function (e) {
-                var old_scroll_factor = scroll_factor;
-                mouse_x = e.pageX;
-                mouse_y = e.pageY;
-                if (e.originalEvent.wheelDelta >= 0) {
-                    // Scrolled up
-                    scroll_factor = Math.min(32, scroll_factor + 1);
-                    if (scroll_factor != old_scroll_factor) {
-                        container_pan_x += ((container_pan_x + mouse_x) / (canvas_size * (scroll_factor - 1))) * canvas_size;
-                        container_pan_y += ((container_pan_y + mouse_y) / (canvas_size * (scroll_factor - 1))) * canvas_size;
-                     }
-                } else {
-                    // Scrolled Down
-                    scroll_factor =  Math.max(1, scroll_factor - 1);
-                    if (scroll_factor != old_scroll_factor) {
-                        container_pan_x -= ((container_pan_x + mouse_x) / (canvas_size * (scroll_factor + 1))) * canvas_size;
-                        container_pan_y -= ((container_pan_y + mouse_y) / (canvas_size * (scroll_factor + 1))) * canvas_size;
-                    }
-                }
-                small_star_container.scale.x = scroll_factor;
-                small_star_container.scale.y = scroll_factor;
-                large_star_container.scale.x = scroll_factor / 32;
-                large_star_container.scale.y = scroll_factor / 32;
-                small_star_container.x = -(container_pan_x);
-                small_star_container.y = -(container_pan_y);
-                large_star_container.x = -(container_pan_x);
-                large_star_container.y = -(container_pan_y);
-            });
-
-            $(window).on("mousedown", function (e) {
-                e.preventDefault();
-                // Left Mouse
-                if (e.which == 1) {
-                    mouse_x = e.pageX;
-                    mouse_y = e.pageY;
-                    var x_coord = Math.floor((container_pan_x + mouse_x) / scroll_factor - (canvas_size / 2));
-                    var y_coord = -Math.floor((container_pan_y + mouse_y) / scroll_factor - (canvas_size / 2));
-                    console.log(x_coord + ' : ' + y_coord);
-                    for (var star_inx in stars) {
-                        var star = stars[star_inx];
-                        if (star.coordinates[0] == x_coord && star.coordinates[1] ==  y_coord) {
-                            $('#star-system-name').html(
-                                star.name +
-                                ' <small id="star-system-coordinates" class="text-muted">' + '(' + star.coordinates[0] + ', ' + star.coordinates[1] + ')' + '</small>'
-                            );
-
-                        }
-                    }
-                } // Middle Mouse
-                else if (e.which == 2) {
-                    moved = false;
-                    down = true;
-                    mouse_x = e.pageX;
-                    mouse_y = e.pageY;
-                    top = $(this).scrollTop();
-                    left = $(this).scrollLeft();
-                }
-            });
-
-            $(window).on("mousemove", function (e) {
-                if (down) {
-                    moved = true;
-                    var newX = e.pageX;
-                    var newY = e.pageY;
-
-                    mouse_scroll_x = left - newX + mouse_x;
-                    mouse_scroll_y = top - newY + mouse_y;
-                    small_star_container.x = -(container_pan_x + mouse_scroll_x);
-                    small_star_container.y = -(container_pan_y + mouse_scroll_y);
-                    large_star_container.x = -(container_pan_x + mouse_scroll_x);
-                    large_star_container.y = -(container_pan_y + mouse_scroll_y);
-                }
-            });
-
-            $(window).on("mouseup", function (e) {
-                if (moved){
-                    down = false;
-                    moved = false;
-                    container_pan_x = (container_pan_x + mouse_scroll_x);
-                    container_pan_y = (container_pan_y + mouse_scroll_y);
-                }
-            });
-
-            $('#slide').on('click', function () {
-                var contextual_window = $('#contextual-window');
-                if (contextual_window.hasClass('visible')) {
-                    contextual_window.animate({'left': '-1200px'}, 500).removeClass('visible')
-                } else {
-                    contextual_window.animate({'left': '50px'}, 500).addClass('visible')
-                }
-            });
+            $('#slide').on('click', function (e) {handlers.slide_click(e, world);} );
         })
     </script>
 </body>

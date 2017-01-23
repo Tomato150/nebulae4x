@@ -31,6 +31,8 @@ class Galaxy:
 
 		self.star_quadrants = {}
 
+		inx = 0
+
 		bounds = [int(self.size_of_canvas / 20 * -1), int(self.size_of_canvas / 20)]
 		for x in range(bounds[0], bounds[1]):
 			self.star_quadrants[str(x)] = {}
@@ -39,7 +41,8 @@ class Galaxy:
 
 		arm_separation = (2 * math.pi) / self.num_of_arms
 
-		for inx in range(0, self.num_of_stars):
+		while True:
+
 			# Get distance from galactic center
 			distance = random() ** 2
 
@@ -64,8 +67,8 @@ class Galaxy:
 				angle = int((angle / arm_separation)) * arm_separation + arm_offset + rotation
 
 				# Translate to cartesian coordinates
-				star_x = int(math.cos(angle) * distance * self.size_of_canvas / 2)
-				star_y = int(math.sin(angle) * distance * self.size_of_canvas / 2)
+				star_x = int(math.cos(angle) * distance * (self.size_of_canvas/50 * 49) / 2)
+				star_y = int(math.sin(angle) * distance * (self.size_of_canvas/50 * 49) / 2)
 
 				# Random Offset
 				if inx % self.x_y_rand_offset == 0:
@@ -101,7 +104,12 @@ class Galaxy:
 				quadrant_y = int(star_y / 10)
 				star_collision = False
 
-				if -200 <= quadrant_x < 200 and -200 <= quadrant_y < 200:
+				for star in self.star_quadrants[str(quadrant_x)][str(quadrant_y)]:
+					coordinates = star.get_coordinates()
+					if -1 <= coordinates[0] - star_x <= 1 and -1 <= coordinates[1] - star_y <= 1:
+						star_collision = True
+
+				if -200 <= quadrant_x < 200 and -200 <= quadrant_y < 200 and not star_collision:
 					for quad_x in range(quadrant_x - 1, quadrant_x + 2):
 						if quad_x in range(bounds[0], bounds[1]):
 							for quad_y in range(quadrant_y - 1, quadrant_y + 2):
@@ -117,11 +125,17 @@ class Galaxy:
 
 				# Appending to right dictionary
 				if not star_collision:
+					inx += 1
+					if inx % 10000 == 0:
+						print(inx)
 					star_object = Star(star_x, star_y)
 					self.star_quadrants[str(quadrant_x)][str(quadrant_y)].append(star_object)
 					self.stars.append(star_object)
+					if inx == self.num_of_stars:
+						break
 
 		print('Done: Galaxy Generation')
+		print('Count: ' + str(inx))
 
 		self.stars[0].name = 'Sol'
 		self._generate_earth_system(self.stars[0])
