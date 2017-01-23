@@ -1,14 +1,26 @@
-from game_data.constants import galaxy_generation_constants as constants
+from game_data.constants import galaxy_generation_constants as constants, general_constants
 
 from random import randint, random, uniform, choice
 import math
+
+
+def name_creator(mini, maxi, syl):
+	name = ""
+	for i in range(0, syl):
+		name = name + choice(general_constants.CONSONANTS)
+		for j in range(1, randint(mini, maxi)):
+			if name[i-1] in general_constants.CONSONANTS:
+				name = name + choice(general_constants.VOWELS)
+			else:
+				name = name + choice(general_constants.CONSONANTS)
+	return name.capitalize()
 
 
 class Galaxy:
 	def __init__(self):
 		# Constants to change to fuck with the shape of the galaxy
 		self.num_of_stars = 50000
-		self.num_of_arms = 6  # 6
+		self.num_of_arms = 5  # 6
 		self.arm_offset_max = 0.5  # 0.5
 		self.rotation_factor = 3
 		self.size_of_canvas = 6000
@@ -111,6 +123,7 @@ class Galaxy:
 
 		print('Done: Galaxy Generation')
 
+		self.stars[0].name = 'Sol'
 		self._generate_earth_system(self.stars[0])
 
 	def _generate_earth_system(self, solar_system):
@@ -122,7 +135,10 @@ class Galaxy:
 
 
 class Star:
-	def __init__(self, x, y):
+	def __init__(self, x, y, **kwargs):
+		# System General information
+		self.name = name_creator(randint(2, 3), randint(3, 5), randint(1, 2))
+
 		# System Location Information
 		self.coordinates = [int(x), int(y)]
 
@@ -133,6 +149,9 @@ class Star:
 
 		# System Contents information:
 		self.planets = []
+
+		# Update kwargs
+		self.__dict__.update(kwargs)
 
 	# GETTERS:
 	def get_coordinates(self):

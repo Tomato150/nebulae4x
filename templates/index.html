@@ -21,6 +21,10 @@
 
     <div id="contextual-window" style="left: -1200px;">
         <div class="container-fluid" style="padding: 5px;">
+            <h1 id="star-system-name"><small id="star-system-coordinates" class="text-muted"></small></h1>
+
+            <hr>
+
             <ul class="nav nav-pills">
                 <li class="nav-item"><a class="nav-link active" data-toggle="tab" role="tab" href="#production-tab">Production</a></li>
                 <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" href="#fleet-tab">Fleets</a></li>
@@ -31,6 +35,8 @@
             <div class="tab-content">
                 <div class="tab-pane active" id="production-tab" role="tabpanel">
                     <h1>product</h1>
+                    <hr>
+                    <h1 id="colony"></h1>
                 </div>
                 <div class="tab-pane" id="fleet-tab" role="tabpanel">
                     <h1>flet</h1>
@@ -115,13 +121,13 @@
                     );
                     var star = stars[star_index];
                     star_sprite.x = star.coordinates[0] + 3000;
-                    star_sprite.y = star.coordinates[1] + 3000;
+                    star_sprite.y = -star.coordinates[1] + 3000;
 
                     var large_star_sprite = new Sprite(
                         resources[star.file_path].texture
                     );
                     large_star_sprite.x = star.coordinates[0] * 32 + (3000 * 32);
-                    large_star_sprite.y = star.coordinates[1] * 32 + (3000 * 32);
+                    large_star_sprite.y = -star.coordinates[1] * 32 + (3000 * 32);
 
                     small_star_container.addChild(star_sprite);
                     large_star_container.addChild(large_star_sprite);
@@ -143,36 +149,25 @@
                 renderer.render(stage)
             }
 
-            $('#slide').on('click', function () {
-                var contextual_window = $('#contextual-window');
-                if (contextual_window.hasClass('visible')) {
-                    contextual_window.animate({'left': '-1200px'}, 500).removeClass('visible')
-                } else {
-                    contextual_window.animate({'left': '50px'}, 500).addClass('visible')
-                }
-            });
-
             $(window).on("mousewheel", function (e) {
                 var old_scroll_factor = scroll_factor;
-                x = e.pageX;
-                y = e.pageY;
+                mouse_x = e.pageX;
+                mouse_y = e.pageY;
                 if (e.originalEvent.wheelDelta >= 0) {
                     // Scrolled up
                     scroll_factor = Math.min(32, scroll_factor + 1);
                     if (scroll_factor != old_scroll_factor) {
-                        console.log('Container width: ' + large_star_container.width);
-                        container_pan_x += ((container_pan_x + x) / large_star_container.width) * 6000;
-                        container_pan_y += ((container_pan_y + y) / large_star_container.height) * 6000;
+                        container_pan_x += ((container_pan_x + mouse_x) / (6000 * (scroll_factor - 1))) * 6000;
+                        container_pan_y += ((container_pan_y + mouse_y) / (6000 * (scroll_factor - 1))) * 6000;
                      }
                 } else {
                     // Scrolled Down
                     scroll_factor =  Math.max(1, scroll_factor - 1);
                     if (scroll_factor != old_scroll_factor) {
-                        container_pan_x -= ((container_pan_x + x) / large_star_container.width) * 6000;
-                        container_pan_y -= ((container_pan_y + y) / large_star_container.height) * 6000;
+                        container_pan_x -= ((container_pan_x + mouse_x) / (6000 * (scroll_factor + 1))) * 6000;
+                        container_pan_y -= ((container_pan_y + mouse_y) / (6000 * (scroll_factor + 1))) * 6000;
                     }
                 }
-
                 small_star_container.scale.x = scroll_factor;
                 small_star_container.scale.y = scroll_factor;
                 large_star_container.scale.x = scroll_factor / 32;
@@ -181,47 +176,75 @@
                 small_star_container.y = -(container_pan_y);
                 large_star_container.x = -(container_pan_x);
                 large_star_container.y = -(container_pan_y);
-                console.log(-(container_pan_x + mouse_scroll_x));
-                console.log(-(container_pan_y + mouse_scroll_y));
-                console.log(scroll_factor);
             });
 
             // DragScroll
-            var x,y,top,left,down,
+            var mouse_x,mouse_y,top,left,down,moved,
                     container_pan_x = 0,
                     container_pan_y = 0,
                     mouse_scroll_x = 0,
                     mouse_scroll_y = 0;
 
-            $('body').on("mousedown", function (e) {
+            $(window).on("mousedown", function (e) {
                 e.preventDefault();
-                down = true;
-                x = e.pageX;
-                y = e.pageY;
-                top = $(this).scrollTop();
-                left = $(this).scrollLeft();
+                if (e.which == 1) {
+                    // Left Mouse
+                    mouse_x = e.pageX;
+                    mouse_y = e.pageY;
+                    var x_coord = Math.floor((container_pan_x + mouse_x) / scroll_factor - 3000);
+                    var y_coord = -Math.floor((container_pan_y + mouse_y) / scroll_factor - 3000);
+                    console.log(x_coord + ' : ' + y_coord);
+                    for (var star_inx in stars) {
+                        var star = stars[star_inx];
+                        if (star.coordinates[0] == x_coord && star.coordinates[1] ==  y_coord) {
+                            $('#star-system-name').html(
+                                    star.name +
+                                    ' <small id="star-system-coordinates" class="text-muted">' + '(' + star.coordinates[0] + ', ' + star.coordinates[1] + ')' + '</small>')
+                            ;
+                        }
+                    }
+                } else if (e.which == 2) {
+                    // Middle Mouse
+                    moved = false;
+                    down = true;
+                    mouse_x = e.pageX;
+                    mouse_y = e.pageY;
+                    top = $(this).scrollTop();
+                    left = $(this).scrollLeft();
+                }
             });
 
-            $("body").on("mousemove", function (e) {
+            $(window).on("mousemove", function (e) {
                 if (down) {
+                    moved = true;
                     var newX = e.pageX;
                     var newY = e.pageY;
 
-                    mouse_scroll_x = left - newX + x;
-                    mouse_scroll_y = top - newY + y;
-                    console.log('Container x: ' + -(container_pan_x + mouse_scroll_x));
+                    mouse_scroll_x = left - newX + mouse_x;
+                    mouse_scroll_y = top - newY + mouse_y;
                     small_star_container.x = -(container_pan_x + mouse_scroll_x);
-                    large_star_container.x = -(container_pan_x + mouse_scroll_x);
-                    console.log('Container Y: ' + -(container_pan_y + mouse_scroll_y));
                     small_star_container.y = -(container_pan_y + mouse_scroll_y);
+                    large_star_container.x = -(container_pan_x + mouse_scroll_x);
                     large_star_container.y = -(container_pan_y + mouse_scroll_y);
                 }
             });
 
-            $("body").on("mouseup", function (e) {
-                down = false;
-                container_pan_x = (container_pan_x + mouse_scroll_x);
-                container_pan_y = (container_pan_y + mouse_scroll_y);
+            $(window).on("mouseup", function (e) {
+                if (moved){
+                    down = false;
+                    moved = false;
+                    container_pan_x = (container_pan_x + mouse_scroll_x);
+                    container_pan_y = (container_pan_y + mouse_scroll_y);
+                }
+            });
+
+            $('#slide').on('click', function () {
+                var contextual_window = $('#contextual-window');
+                if (contextual_window.hasClass('visible')) {
+                    contextual_window.animate({'left': '-1200px'}, 500).removeClass('visible')
+                } else {
+                    contextual_window.animate({'left': '50px'}, 500).addClass('visible')
+                }
             });
         })
     </script>
