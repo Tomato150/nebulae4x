@@ -3,6 +3,27 @@
  */
 
 var handler_object = (function () {
+    function __set_contextual_window_star(config) {
+        $('#star-system-name').html(
+            config.selected_star.name +
+            ' <small id="star-system-coordinates" class="text-muted">' + '(' + config.selected_star.coordinates[0] + ', ' + config.selected_star.coordinates[1] + ')' + '</small>'
+        );
+
+        var planets_html = '';
+        var planets_present = false;
+        for (var planet_inx in config.selected_star.planets) {
+            planets_present = true;
+            var planet = config.selected_star.planets[planet_inx];
+            var template = config.system_overview_planet_card_template();
+            planets_html += template.render({name: planet.name})
+        }
+        if (!planets_present) {
+            config.system_overview_planets.removeClass('card').html('<p>There are no detected bodies in this system.</p>')
+        } else {
+            config.system_overview_planets.addClass('card').html(planets_html);
+        }
+    }
+
     function _mouse_scroll(e, world) {
         var config = world.get_config();
         var old_scroll_factor = config.scroll_factor;
@@ -33,7 +54,7 @@ var handler_object = (function () {
         config.large_star_container.y = -(config.container_pan_y);
     }
 
-    function _mouse_click_down(e, world) {
+    function _canvas_mouse_click_down(e, world) {
         var config = world.get_config();
         e.preventDefault();
         // Left Mouse
@@ -45,11 +66,15 @@ var handler_object = (function () {
             for (var star_inx in config.stars) {
                 var star = config.stars[star_inx];
                 if (star.coordinates[0] == x_coord && star.coordinates[1] ==  y_coord) {
-                    $('#star-system-name').html(
-                        star.name +
-                        ' <small id="star-system-coordinates" class="text-muted">' + '(' + star.coordinates[0] + ', ' + star.coordinates[1] + ')' + '</small>'
-                    );
+                    config.selected_star = star;
+                    __set_contextual_window_star(config);
 
+                    // Make necessaries visible.
+                    config.contextual_window_system.removeAttr('hidden');
+                    config.contextual_window_planetary.attr('hidden', '');
+                    if (!config.contextual_window.hasClass('visible')) {
+                        _slide_click(e, world)
+                    }
                 }
             }
         }
@@ -96,11 +121,21 @@ var handler_object = (function () {
         }
     }
 
+    function _planet_card_click(e, world) {
+        var config = world.get_config();
+
+        console.log(e);
+
+        config.contextual_window_system.attr('hidden', '');
+        config.contextual_window_planetary.removeAttr('hidden');
+    }
+
     return {
         mouse_scroll: _mouse_scroll,
-        mouse_click: _mouse_click_down,
+        canvas_mouse_click: _canvas_mouse_click_down,
         mouse_move: _mouse_move,
         mouse_click_up: _mouse_click_up,
-        slide_click: _slide_click
+        slide_click: _slide_click,
+        planet_card_click: _planet_card_click
     }
 })();

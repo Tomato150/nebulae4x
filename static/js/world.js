@@ -12,12 +12,21 @@ var world_object = (function () {
 
     var config = {
         // Calculation based information
-        'stars': 50000,
+        'stars': [],
+        'selected_star': null,
         'canvas_size': 6000,
         'scroll_factor': 1,
 
         // Jquery References
         'contextual_window': $('#contextual-window'),
+
+        // Contextual window related to system information
+        'contextual_window_system': $('#system-container'),
+            'system_overview_planets': $('#system-overview-tab-planets'),
+            'system_overview_planet_card_template': __get_planet_card_template,
+
+        // Contextual window related to planetary information
+        'contextual_window_planetary': $('#planetary-container'),
         'canvas': $('#canvas'),
 
         // DragScroll
@@ -51,15 +60,15 @@ var world_object = (function () {
             success: function (server_data) {
                 config.stars = server_data['stars'];
                 config.canvas_size = server_data['canvas_size'];
-                loader.add("/static/images/white.png")
-                    .add("/static/images/stars/B_D_1.png")
-                    .add("/static/images/stars/B_G_1.png")
-                    .add("/static/images/stars/B_M_1.png")
-                    .add("/static/images/stars/R_D_1.png")
-                    .add("/static/images/stars/R_G_1.png")
-                    .add("/static/images/stars/R_M_1.png")
-                    .add("/static/images/stars/R_SG_1.png")
-                    .add("/static/images/stars/Y_M_1.png")
+                loader.add('/static/images/white.png')
+                    .add('/static/images/stars/B_D_1.png')
+                    .add('/static/images/stars/B_G_1.png')
+                    .add('/static/images/stars/B_M_1.png')
+                    .add('/static/images/stars/R_D_1.png')
+                    .add('/static/images/stars/R_G_1.png')
+                    .add('/static/images/stars/R_M_1.png')
+                    .add('/static/images/stars/R_SG_1.png')
+                    .add('/static/images/stars/Y_M_1.png')
                     .load(_setup);
             },
             error: function (xhr, ajaxOptions, thrownError) {alert('Error: Unable to load page: ' + thrownError);}
@@ -82,10 +91,14 @@ var world_object = (function () {
         config.stage.addChild(config.stage_container);
     }
 
+    function __get_planet_card_template() {
+        return $.templates('#planet-card-template')
+    }
+
     function _setup() {
         for (var star_index in config.stars) {
             var star_sprite = new Sprite(
-                resources["/static/images/white.png"].texture
+                resources['/static/images/white.png'].texture
             );
             var star = config.stars[star_index];
             star_sprite.x = star.coordinates[0] + (config.canvas_size / 2);
