@@ -14,6 +14,7 @@ var world_object = (function () {
         // Calculation based information
         'stars': [],
         'selected_star': null,
+        'selected_planet': null,
         'canvas_size': 6000,
         'scroll_factor': 1,
 
@@ -74,7 +75,7 @@ var world_object = (function () {
             error: function (xhr, ajaxOptions, thrownError) {alert('Error: Unable to load page: ' + thrownError);}
         });
 
-        config.contextual_window.height($(window).height() - 100).width((config.contextual_window.height() - 100) / 1.6);
+        config.contextual_window.height($(window).height() - 100).width((config.contextual_window.height() - 100) /1.3);
         config.canvas.attr({
             'height': config.canvas_size,
             'width': config.canvas_size
@@ -96,11 +97,11 @@ var world_object = (function () {
     }
 
     function _setup() {
-        for (var star_index in config.stars) {
+        for (var star_identity in config.stars) {
             var star_sprite = new Sprite(
                 resources['/static/images/white.png'].texture
             );
-            var star = config.stars[star_index];
+            var star = config.stars[star_identity];
             star_sprite.x = star.coordinates[0] + (config.canvas_size / 2);
             star_sprite.y = -star.coordinates[1] + (config.canvas_size / 2);
 

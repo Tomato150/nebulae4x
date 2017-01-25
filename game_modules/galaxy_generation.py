@@ -27,7 +27,7 @@ class Galaxy:
 		self.x_y_rand_offset = 20
 		self.galactic_center_cutoff = 0
 
-		self.stars = []
+		self.stars = {}
 
 		self.star_quadrants = {}
 
@@ -37,7 +37,7 @@ class Galaxy:
 		for x in range(bounds[0], bounds[1]):
 			self.star_quadrants[str(x)] = {}
 			for y in range(bounds[0], bounds[1]):
-				self.star_quadrants[str(x)][str(y)] = []
+				self.star_quadrants[str(x)][str(y)] = {}
 
 		arm_separation = (2 * math.pi) / self.num_of_arms
 
@@ -104,44 +104,51 @@ class Galaxy:
 				quadrant_y = int(star_y / 10)
 				star_collision = False
 
-				for star in self.star_quadrants[str(quadrant_x)][str(quadrant_y)]:
+				for star_id, star in self.star_quadrants[str(quadrant_x)][str(quadrant_y)].items():
 					coordinates = star.get_coordinates()
 					if -1 <= coordinates[0] - star_x <= 1 and -1 <= coordinates[1] - star_y <= 1:
 						star_collision = True
 
 				if -200 <= quadrant_x < 200 and -200 <= quadrant_y < 200 and not star_collision:
+
 					for quad_x in range(quadrant_x - 1, quadrant_x + 2):
-						if quad_x in range(bounds[0], bounds[1]):
+						if quad_x in range(bounds[0], bounds[1]) and not star_collision:
+
 							for quad_y in range(quadrant_y - 1, quadrant_y + 2):
-								if quad_y in range(bounds[0], bounds[1]):
-									for star in self.star_quadrants[str(quad_x)][str(quad_y)]:
+								if quad_y in range(bounds[0], bounds[1]) and not star_collision:
+
+									for star_id, star in self.star_quadrants[str(quad_x)][str(quad_y)].items():
 										coordinates = star.get_coordinates()
 										if -1 <= coordinates[0] - star_x <= 1 and -1 <= coordinates[1] - star_y <= 1:
 											star_collision = True
+
 								else:
 									continue
+
 						else:
 							continue
 
 				# Appending to right dictionary
 				if not star_collision:
+					star_object = Star(inx, star_x, star_y)
+					self.star_quadrants[str(quadrant_x)][str(quadrant_y)][str(inx)] = star_object
+					self.stars[str(inx)] = star_object
+
 					inx += 1
 					if inx % 10000 == 0:
 						print(inx)
-					star_object = Star(star_x, star_y)
-					self.star_quadrants[str(quadrant_x)][str(quadrant_y)].append(star_object)
-					self.stars.append(star_object)
+
 					if inx == self.num_of_stars:
 						break
 
 		print('Done: Galaxy Generation')
 		print('Count: ' + str(inx))
 
-		self.stars[0].name = 'Sol'
-		self._generate_earth_system(self.stars[0])
+		self.stars['0'].name = 'Sol'
+		self._generate_earth_system(self.stars['0'])
 
 	def _generate_earth_system(self, solar_system):
-		solar_system.add_planet(TerrestrialBody('Earth', solar_system, 0))
+		solar_system.add_planet(0, TerrestrialBody(0, 'Earth', solar_system, 0))
 
 	# GETTERS
 	def get_stars(self):
@@ -152,8 +159,9 @@ class Galaxy:
 
 
 class Star:
-	def __init__(self, x, y, **kwargs):
+	def __init__(self, star_id, x, y, **kwargs):
 		# System General information
+		self.star_id = star_id
 		self.name = name_creator(randint(2, 3), randint(3, 5), randint(1, 2))
 
 		# System Location Information
@@ -165,7 +173,7 @@ class Star:
 		self.file_path = choice(star[1])
 
 		# System Contents information:
-		self.planets = []
+		self.planets = {}
 
 		# Update kwargs
 		self.__dict__.update(kwargs)
@@ -175,16 +183,23 @@ class Star:
 		# [x, y]
 		return self.coordinates
 
+	def get_id(self):
+		return self.star_id
+
 	# SETTERS:
-	def add_planet(self, planet):
-		self.planets.append(planet)
+	def add_planet(self, planet_id, planet):
+		self.planets[planet_id] = planet
 
 
 class TerrestrialBody:
-	def __init__(self, name, star_instace, orbit_index, **kwargs):
+	def __init__(self, planet_id, name, star_instace, orbit_index, **kwargs):
 		# Planet Location and General Information
+		self.planet_id = planet_id
 		self.name = name
+
+		# Planet parent body relevant information
 		self.parent_body = star_instace  # The instance of the star/planet that it orbits
+		self.parent_body_id = star_instace.get_id()
 		self.orbit_index = orbit_index  # 0, 1, 2 ... n
 
 		# Planet Type information

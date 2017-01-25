@@ -6,7 +6,7 @@ var handler_object = (function () {
     function __set_contextual_window_star(config) {
         $('#star-system-name').html(
             config.selected_star.name +
-            ' <small id="star-system-coordinates" class="text-muted">' + '(' + config.selected_star.coordinates[0] + ', ' + config.selected_star.coordinates[1] + ')' + '</small>'
+            '   <small id="star-system-coordinates" class="text-muted">' + '(' + config.selected_star.coordinates[0] + ', ' + config.selected_star.coordinates[1] + ')' + '</small>'
         );
 
         var planets_html = '';
@@ -15,7 +15,7 @@ var handler_object = (function () {
             planets_present = true;
             var planet = config.selected_star.planets[planet_inx];
             var template = config.system_overview_planet_card_template();
-            planets_html += template.render({name: planet.name})
+            planets_html += template.render({name: planet.name, planet_id: planet.planet_id})
         }
         if (!planets_present) {
             config.system_overview_planets.removeClass('card').html('<p>There are no detected bodies in this system.</p>')
@@ -63,17 +63,20 @@ var handler_object = (function () {
         if (e.which == 1) {
             var x_coord = Math.floor((config.container_pan_x + config.mouse_x) / config.scroll_factor - (config.canvas_size / 2));
             var y_coord = -Math.floor((config.container_pan_y + config.mouse_y) / config.scroll_factor - (config.canvas_size / 2));
+            var old_star = config.selected_star;
             for (var star_inx in config.stars) {
-                var star = config.stars[star_inx];
-                if (star.coordinates[0] == x_coord && star.coordinates[1] ==  y_coord) {
-                    config.selected_star = star;
-                    __set_contextual_window_star(config);
+                if (old_star == config.selected_star) {
+                    var star = config.stars[star_inx];
+                    if (star.coordinates[0] == x_coord && star.coordinates[1] ==  y_coord) {
+                        config.selected_star = star;
+                        __set_contextual_window_star(config);
 
-                    // Make necessaries visible.
-                    config.contextual_window_system.removeAttr('hidden');
-                    config.contextual_window_planetary.attr('hidden', '');
-                    if (!config.contextual_window.hasClass('visible')) {
-                        _slide_click(e, world)
+                        // Make necessaries visible.
+                        config.contextual_window_system.removeAttr('hidden');
+                        config.contextual_window_planetary.attr('hidden', '');
+                        if (!config.contextual_window.hasClass('visible')) {
+                            config.contextual_window.stop().animate({'left': '50px'}, 500).addClass('visible')
+                        }
                     }
                 }
             }
@@ -113,21 +116,32 @@ var handler_object = (function () {
 
     function _slide_click(e, world) {
         var config = world.get_config();
-        var contextual_window = config.contextual_window;
-        if (contextual_window.hasClass('visible')) {
-            contextual_window.stop().animate({'left': '-1200px'}, 500).removeClass('visible')
+        if (config.contextual_window.hasClass('visible')) {
+            config.contextual_window.stop().animate({'left': '-1200px'}, 500).removeClass('visible')
         } else {
-            contextual_window.stop().animate({'left': '50px'}, 500).addClass('visible')
+            config.contextual_window.stop().animate({'left': '50px'}, 500).addClass('visible')
         }
     }
 
-    function _planet_card_click(e, world) {
+    function _planet_card_click(e, world, planet_id) {
         var config = world.get_config();
+        config.selected_planet = config.selected_star.planets[planet_id];
 
-        console.log(e);
+        $('#planet-system-name').html(
+            config.selected_planet.name +
+            '   <small id="planet-star-system-parent" class="text-muted">Of <a href="#star-' + config.selected_star.star_id + '" class="star-link" data-star_id="' + config.selected_star.star_id + '">' + config.selected_star.name + '</a></small>'
+        );
 
         config.contextual_window_system.attr('hidden', '');
         config.contextual_window_planetary.removeAttr('hidden');
+    }
+
+    // A function to transition to the system contextual window from a planet without the need for changing it.
+    function _star_link(e, world) {
+        var config = world.get_config();
+
+        config.contextual_window_system.removeAttr('hidden');
+        config.contextual_window_planetary.attr('hidden', '');
     }
 
     return {
@@ -136,6 +150,7 @@ var handler_object = (function () {
         mouse_move: _mouse_move,
         mouse_click_up: _mouse_click_up,
         slide_click: _slide_click,
-        planet_card_click: _planet_card_click
+        planet_card_click: _planet_card_click,
+        star_link: _star_link
     }
 })();
