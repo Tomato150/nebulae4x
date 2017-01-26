@@ -21,34 +21,27 @@ class Colony:
 			'space_stations': [1, 4]  # E.G., A level 1 and a level 4 space station in orbit
 		}
 
-		self.construction_queue = [
-			ConstructionProject('mines', 10, constants.MINES_COST, 50, 100)
-		]
+		self.construction_queue = []
 
 		# Colony Storage
 		self.resource_storage = {
 			'water': {
 				'max': 999999999999,
-				'current': 0
+				'current': 999999999
 			},
 			'building_materials': {
 				'max': 999999999999,
-				'current': 0
+				'current': 999999
 			}
 		}
+
+	def add_buildings(self, building, index=0):
+		if building in self.quantity_buildings:
+			self.quantity_buildings[building] += 1
+		else:
+			self.quality_buildings[building][index] += 1
 
 	def update_construction(self):
 		for construction_project in self.construction_queue:
 			construction_project.tick_construction()
 
-
-class ConstructionProject(object):
-	def __init__(self, target, amount, cost, current_completed, delegation):
-		self.target = target
-		self.amount = int(amount)
-		self.cost = cost
-		self.current_completed = int(current_completed)
-		self.delegation = int(delegation)  # Amount of factories working on this project
-
-	def tick_construction(self):  # Daily tick based.
-		pass
