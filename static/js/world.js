@@ -12,22 +12,35 @@ var world_object = (function () {
 
     var config = {
         // Calculation based information
-        'stars': [],
+        'stars': null,
+        'planets': null,
+
+        'empires': null,
+        'colonies': null,
+        'construction_projects': null,
+
+        'fleets': null,
+        'ships': null,
+
+        'player_empire': null,
         'selected_star': null,
         'selected_planet': null,
         'canvas_size': 6000,
         'scroll_factor': 1,
 
         // Jquery References
-        'contextual_window': $('#contextual-window'),
+        'main_menu_div': $('#main-menu-div'),
 
-        // Contextual window related to system information
-        'contextual_window_system': $('#system-container'),
-            'system_overview_planets': $('#system-overview-tab-planets'),
-            'system_overview_planet_card_template': __get_planet_card_template,
+        // Main menu window related to system information
+        'set_menu_for': {
+            'empire-menu': _set_main_to_empire,
+            'system-menu': _set_main_to_system
+        },
 
-        // Contextual window related to planetary information
-        'contextual_window_planetary': $('#planetary-container'),
+        'main_menu_header_title': $('#main-menu-header-title'),
+
+        // Pixi.js Canvas display information
+        'currently_viewing': 'local_system_canvas',
         'canvas': $('#canvas'),
 
         // DragScroll
@@ -44,12 +57,24 @@ var world_object = (function () {
         'mouse_scroll_x': 0,
         'mouse_scroll_y': 0,
 
+        // Pixi.js renderers and containers.
         'renderer': null,
         'stage': null,
         'stage_container': null,
-        'small_star_container': null,
-        'large_star_container': null
+        'galaxy_non_star_container': null,  // Contains information about fleets and other occurrences
+        'galaxy_star_container': null,  // Contains stars on the galaxy map
+        'local_system_body_container': null,  // Contains bodies, such as planets, suns, and asteroids
+        'local_system_other_container': null  // Contains information about fleets and other occurrences
     };
+
+    function _size_windows() {
+        config.main_menu_div.height($(window).height() - 58 - 40).width(($(window).width() - 40)).css({'left': '20px', 'top': '78px'});
+        var attribute_list = {
+            'height': config.canvas_size,
+            'width': config.canvas_size
+        };
+        config.canvas.attr(attribute_list);
+    }
 
     function _init() {
 
@@ -59,53 +84,42 @@ var world_object = (function () {
             dataType: 'json',
             contentType: 'application/json',
             success: function (server_data) {
-                config.stars = server_data['stars'];
-                config.canvas_size = server_data['canvas_size'];
-                loader.add('/static/images/white.png')
-                    .add('/static/images/stars/B_D_1.png')
-                    .add('/static/images/stars/B_G_1.png')
-                    .add('/static/images/stars/B_M_1.png')
-                    .add('/static/images/stars/R_D_1.png')
-                    .add('/static/images/stars/R_G_1.png')
-                    .add('/static/images/stars/R_M_1.png')
-                    .add('/static/images/stars/R_SG_1.png')
-                    .add('/static/images/stars/Y_M_1.png')
-                    .load(_setup);
+                $.extend(config, server_data);
             },
             error: function (xhr, ajaxOptions, thrownError) {alert('Error: Unable to load page: ' + thrownError);}
         });
 
-        config.contextual_window.height($(window).height() - 100).width((config.contextual_window.height() - 100) /1.3);
-        config.canvas.attr({
-            'height': config.canvas_size,
-            'width': config.canvas_size
-        });
+        _size_windows();
+
+        loader.add('/static/images/stars/B_D_1.png')
+            .add('/static/images/stars/B_G_1.png')
+            .add('/static/images/stars/B_M_1.png')
+            .add('/static/images/stars/R_D_1.png')
+            .add('/static/images/stars/R_G_1.png')
+            .add('/static/images/stars/R_M_1.png')
+            .add('/static/images/stars/R_SG_1.png')
+            .add('/static/images/stars/Y_M_1.png')
+            .load(_setup);
 
         config.renderer = autoDetectRenderer(config.canvas_size, config.canvas_size, {view: config.canvas[0]});
         config.stage = new Container();
         config.stage_container = new Container();
-        config.small_star_container = new Container();
-        config.large_star_container = new Container();
+        config.galaxy_non_star_container = new Container();
+        config.galaxy_star_container = new Container();
+        config.local_system_body_container = new Container();
+        config.local_system_other_container = new Container();
 
-        config.stage_container.addChild(config.large_star_container);
-        config.stage_container.addChild(config.small_star_container);
+        config.stage_container.addChild(config.galaxy_star_container);
+        config.stage_container.addChild(config.galaxy_non_star_container);
+        config.stage_container.addChild(config.local_system_body_container);
+        config.stage_container.addChild(config.local_system_other_container);
         config.stage.addChild(config.stage_container);
     }
 
-    function __get_planet_card_template() {
-        return $.templates('#planet-card-template')
-    }
-
     function _setup() {
-        for (var star_identity in config.stars) {
-            var star_sprite = new Sprite(
-                resources['/static/images/white.png'].texture
-            );
-            var star = config.stars[star_identity];
-            star_sprite.x = star.coordinates[0] + (config.canvas_size / 2);
-            star_sprite.y = -star.coordinates[1] + (config.canvas_size / 2);
-
-            config.small_star_container.addChild(star_sprite);
+        config.local_system_body_container.addChild(new Sprite(resources['/static/images/stars/B_D_1.png'].texture));
+        for (var star_key in config.stars) {
+            var star = config.stars[star_key];
 
             var large_star_sprite = new Sprite(
                 resources[star.file_path].texture
@@ -113,7 +127,23 @@ var world_object = (function () {
             large_star_sprite.x = star.coordinates[0] * 32 + ((config.canvas_size / 2) * 32);
             large_star_sprite.y = -star.coordinates[1] * 32 + ((config.canvas_size / 2) * 32);
 
-            config.large_star_container.addChild(large_star_sprite);
+            config.galaxy_star_container.addChild(large_star_sprite);
+
+            config.container_pan_x = 3000 - ($(window).width() / 2);
+            config.container_pan_y = 3000 - ($(window).height() / 2);
+
+            config.galaxy_non_star_container.scale.x = config.scroll_factor;
+            config.galaxy_non_star_container.scale.y = config.scroll_factor;
+            config.galaxy_star_container.scale.x = config.scroll_factor / 32;
+            config.galaxy_star_container.scale.y = config.scroll_factor / 32;
+            config.galaxy_non_star_container.x = -(config.container_pan_x);
+            config.galaxy_non_star_container.y = -(config.container_pan_y);
+            config.galaxy_star_container.x = -(config.container_pan_x);
+            config.galaxy_star_container.y = -(config.container_pan_y);
+            config.local_system_body_container.visible = false;
+            config.local_system_other_container.visible = false;
+            config.galaxy_non_star_container.visible = false;
+            config.galaxy_star_container.visible = false;
         }
         _renderLoop();
     }
@@ -121,22 +151,50 @@ var world_object = (function () {
     function _renderLoop() {
         requestAnimationFrame(_renderLoop);
 
-        if (config.scroll_factor < 8) {
-            config.small_star_container.visible = true;
-            config.large_star_container.visible = false;
-        } else {
-            config.small_star_container.visible = false;
-            config.large_star_container.visible = true;
+        if (config.currently_viewing == 'galaxy_canvas') {
+            config.local_system_body_container.visible = false;
+            config.local_system_other_container.visible = false;
+            if (config.scroll_factor < 24) {
+                config.galaxy_non_star_container.visible = false;
+                config.galaxy_star_container.visible = true;
+            } else {
+                config.galaxy_non_star_container.visible = true;
+                config.galaxy_star_container.visible = true;
+            }
+        } else if (config.currently_viewing == 'local_system_canvas') {
+            config.galaxy_non_star_container.visible = false;
+            config.galaxy_star_container.visible = false;
+            config.local_system_body_container.visible = true;
+            config.local_system_other_container.visible = true;
         }
 
         config.renderer.render(config.stage);
     }
 
+    function _set_header(header_text) {
+        config.main_menu_header_title.text(header_text)
+    }
+
+    function _set_main_to_empire() {
+        _set_header('Empire Overview')
+    }
+
+    function _set_main_to_system() {
+        _set_header('System View')
+    }
+
+    function _set_menu_for(data_window_target) {
+        config.set_menu_for[data_window_target]();
+        config.main_menu_div.removeAttr('hidden')
+    }
+
     function _get_config() {
         return config;
     }
+
     return {
         init: _init,
+        set_menu_for: _set_menu_for,
         get_config: _get_config
     }
 })();

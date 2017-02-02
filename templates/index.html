@@ -14,91 +14,104 @@
 </head>
 <body>
 
-    <!-- Hidden Images -->
-    <div hidden>
-        <img src="/static/images/2016_tile.png" alt="star_tile" id="star_tile">
+    <nav class="navbar navbar-toggleable-md fixed-top navbar-inverse bg-inverse" style="background-color: rgba(0, 0, 0, 0.75) !important;">
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbar_content"><span class="navbar-toggler-icon"></span></button>
+        <a class="navbar-brand" href="#" id="main-menu-div-toggle">Menu</a>
+        <div id="navbar_content" class="collapse navbar-collapse" style="display: inline-block">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item"><a class="nav-link navbar-link" data-window-target="empire-menu" href="#">Empire Overview</a></li>
+                <li class="nav-item"><a class="nav-link navbar-link" data-window-target="system-menu" href="#">System Overview</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div id="main-menu-div" style="position: absolute; z-index: 2; background-color: rgba(255, 255, 255, 1); border-radius:0.75rem;">
+        <div class="container-fluid">
+            <div id="main-menu-header" style="margin: 10px;">
+                <div class="row">
+                    <div class="col-xl-12">
+                        <h1 id="main-menu-header-title" style="display: inline-block;">Empire Window</h1>
+                        <button id="main-menu-close" type="button" class="close"><span aria-hidden="true">&times;</span></button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="main-menu-empire-screen">
+                <div class="row">
+                    <div id="empire-pill-navs" class="col-xl-12">
+                        <ul class="nav nav-pills justify-content-center">
+                            <!-- <li class="nav-item"><a href="#" class="nav-link" data-toggle="tab" role="tab"></a></li> -->
+                            <li class="nav-item"><a href="#empire-overview" class="nav-link active" data-toggle="tab" role="tab">Overview</a></li>
+                            <li class="nav-item"><a href="#empire-economy" class="nav-link" data-toggle="tab" role="tab">Economy</a></li>
+                            <li class="nav-item"><a href="#empire-industry" class="nav-link" data-toggle="tab" role="tab">Industry</a></li>
+                            <li class="nav-item"><a href="#empire-fleets" class="nav-link" data-toggle="tab" role="tab">Fleets</a></li>
+                            <li class="nav-item"><a href="#empire-population" class="nav-link" data-toggle="tab" role="tab">Population</a></li>
+                            <li class="nav-item"><a href="#empire-politics" class="nav-link" data-toggle="tab" role="tab">Politics</a></li>
+                            <li class="nav-item"><a href="#empire-diplomacy" class="nav-link" data-toggle="tab" role="tab">Diplomacy</a></li>
+                            <li class="nav-item"><a href="#empire-research" class="nav-link" data-toggle="tab" role="tab">Research</a></li>
+                        </ul>
+
+                        <div class="spacer-lg"></div>
+                    </div>
+
+                    <div id="empire-pill-contents" class="col-xl-12">
+                        <div class="tab-content">
+                            <!-- <div id="" class="tab-pane" role="tabpanel"></div> -->
+                            <div id="empire-overview" class="tab-pane active" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-xl-12">
+                                        <h1>Empire Overview Tab</h1>
+                                        <p>Useless information should go about ... Here</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="empire-economy" class="tab-pane" role="tabpanel">
+                                <h1>Empire Economy Tabpanel</h1>
+                                <p>Useless information should go about ... Here</p>
+                            </div>
+
+                            <div id="empire-industry" class="tab-pane" role="tabpanel">
+                                <h1>Empire Industry Tabpanel</h1>
+                                <p>Useless information should go about ... Here</p>
+                            </div>
+
+                            <div id="empire-fleets" class="tab-pane" role="tabpanel">
+                                <h1>Empire Fleets Tabpanel</h1>
+                                <p>Useless information should go about ... Here</p>
+                            </div>
+
+                            <div id="empire-population" class="tab-pane" role="tabpanel">
+                                <h1>Empire Population Tabpanel</h1>
+                                <p>Useless information should go about ... Here</p>
+                            </div>
+
+                            <div id="empire-politics" class="tab-pane" role="tabpanel">
+                                <h1>Empire Politics Tabpanel</h1>
+                                <p>Useless information should go about ... Here</p>
+                            </div>
+
+                            <div id="empire-diplomacy" class="tab-pane" role="tabpanel">
+                                <h1>Empire Diplomacy Tabpanel</h1>
+                                <p>Useless information should go about ... Here</p>
+                            </div>
+
+                            <div id="empire-research" class="tab-pane" role="tabpanel">
+                                <h1>Empire Research Tabpanel</h1>
+                                <p>Useless information should go about ... Here</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="main-menu-system-screen">
+
+            </div>
+        </div>
     </div>
 
-    <div id="contextual-window" style="left: -1200px;">
-        <div id="system-container" class="container-fluid" style="padding: 10px;">
-            <h1 id="star-system-name"><small id="star-system-coordinates" class="text-muted"></small></h1>
-
-            <div class="spacer-xs"></div>
-
-            <ul class="mx-auto nav nav-pills">
-                <li class="nav-item"><a class="nav-link active" data-toggle="tab" role="tab" href="#system-overview-tab">Overview</a></li>
-                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" href="#system-fleet-tab">Fleets</a></li>
-                <!--<li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" href="#"></a></li>-->
-            </ul>
-
-            <hr style="width: 80%; margin-left: 10%;">
-
-            <div class="tab-content">
-
-                <div id="system-overview-tab" class="tab-pane active" role="tabpanel">
-                    <div class="row">
-                        <div class="col-xl-12">
-                            <h1>Overview</h1>
-                            <div class="spacer-xs"></div>
-                            <h2>Planets</h2>
-                            <!-- For planet template to be rendered in (planet_id="planet-card-template") -->
-                            <div id="system-overview-tab-planets" class="card" role="tablist"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="tab-pane" id="system-fleet-tab" role="tabpanel">
-                    <h1>Fleet</h1>
-                </div>
-
-            </div> <!-- Tab Content Div -->
-        </div> <!-- System Div -->
-
-        <div id="planetary-container" class="container-fluid" style="padding: 10px;">
-            <h1 id="planet-system-name"><small id="planet-solar-system" class="text-muted"></small></h1>
-
-            <div class="spacer-xs"></div>
-
-            <ul class="mx-auto nav nav-pills">
-                <li class="nav-item"><a class="nav-link active" data-toggle="tab" role="tab" href="#planet-overview-tab">Overview</a></li>
-                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" href="#planet-fleet-tab">Fleets</a></li>
-                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" href="#planet-fleet-tab">Fleets1</a></li>
-                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" href="#planet-fleet-tab">Fleets2</a></li>
-                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" href="#planet-fleet-tab">Fleets3</a></li>
-                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" href="#planet-fleet-tab">Fleets4</a></li>
-                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" href="#planet-fleet-tab">Fleets5</a></li>
-            </ul>
-
-            <hr style="width: 80%; margin-left: 10%;">
-
-            <div class="tab-content">
-
-                <div id="planet-overview-tab" class="tab-pane active" role="tabpanel">
-                    <div class="row">
-                        <div class="col-xl-12">
-                            <h1>Overview</h1>
-                            <div class="spacer-xs"></div>
-                            <p>The overview of the planet!</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="planet-fleet-tab" class="tab-pane" role="tabpanel">
-                    <div class="row">
-                        <div class="col-xl-12">
-                            <h1>Fleets</h1>
-                            <div class="spacer-xs"></div>
-                            <p>The Fleet tabs for the planet.</p>
-                        </div>
-                    </div>
-                </div>
-
-            </div> <!-- Tab content div -->
-        </div> <!-- Planet Div -->
-    </div> <!-- Contextual-window -->
-
     <div id="viewport" class="" style="position: fixed; overflow: hidden; height: 100vh; width: 100vw;">
-        <button id="slide" class="btn btn-primary" style="top: 90%; left: 90%; position: fixed;">slide</button>
         <canvas id="canvas"></canvas>
     </div>
 
@@ -135,6 +148,12 @@
             </div>
         </div>
     </script>
+
+    <script id="planet-colony-template" type="text/x-jsrender">
+        <div id="colony-{{:colony_id}}">
+
+                    </div>
+    </script>
     {% endraw %}
 
     <script>
@@ -143,19 +162,37 @@
             var handlers = handler_object;
             world.init();
 
+
+
             $(document).on('mousewheel', function (e) {handlers.mouse_scroll(e, world);});
 
-            $('#canvas').on('mousedown', function (e) {handlers.canvas_mouse_click(e, world);} );
+            $(document).on('mousedown', '#canvas', function (e) {handlers.canvas_mouse_click(e, world);});
+
+            $(document).on('dblclick', '#canvas', function (e) {handlers.galaxy_double_click(e, world);});
 
             $(document).on('mousemove', function (e) {handlers.mouse_move(e, world);} );
 
             $(document).on('mouseup', function (e) {handlers.mouse_click_up(e, world);} );
 
-            $(document).on('dblclick', '.planet-card-header-link', function (e) {handlers.planet_card_click(e, world, $(this).data('planet-id'));});
+            $(document).on('click', '#main-menu-div-toggle', function (e) {
+                e.preventDefault();
+                var main_menu = $('#main-menu-div');
+                if (main_menu.attr('hidden')) {
+                    main_menu.removeAttr('hidden')
+                } else {
+                    main_menu.attr({'hidden': ''})
+                }
+            });
 
-            $('#slide').on('click', function (e) {handlers.slide_click(e, world);} );
-
-            $(document).on('click', '.star-link', function (e) {handlers.star_link(e, world)});
+            $(document).on('click', '#main-menu-close', function () {
+                $('#main-menu-div').attr({'hidden': ''})
+            });
+            
+            $(document).on('click', '.navbar-link', function (e) {
+                e.preventDefault();
+                var data_window_target = $(this).data('window-target');
+                world.set_menu_for(data_window_target)
+            })
         })
     </script>
 </body>
