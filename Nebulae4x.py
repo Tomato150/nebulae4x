@@ -1,6 +1,6 @@
 from flask import *
 
-import flask_handler
+from player_world import player_world
 
 import sqlite3
 import json
@@ -66,9 +66,10 @@ def index():
 
 @app.route('/get_stars', methods=['GET'])
 def get_stars():
-	stars = json.dumps(flask_handler.get_stars(), default=to_json)
-	canvas_size = flask_handler.get_canvas_size()
-	return '{"stars": ' + stars + ',"canvas_size":' + str(canvas_size) + '}'
+	return_vals = player_world.get_all_objects()
+	return_vals.update({'canvas_size': player_world.get_canvas_size()})
+
+	return json.dumps(return_vals, default=to_json)
 
 if __name__ == '__main__':
-	app.run()
+	app.run(host='0.0.0.0')

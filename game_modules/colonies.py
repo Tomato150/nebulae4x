@@ -1,10 +1,11 @@
 from game_data.constants import colonies_constants as constants
 
 class Colony:
-	def __init__(self, name, planet_instance):
+	def __init__(self, colony_id, planet_id, empire_id):
 		# Colony Location and General information
-		self.name = name
-		self.parent_planet = planet_instance
+		self.colony_id = colony_id
+		self.parent_planet_id = planet_id
+		self.parent_empire_id = empire_id
 
 		# Colony Type information
 		self.colony_type = 'mixed'
@@ -21,7 +22,7 @@ class Colony:
 			'space_stations': [1, 4]  # E.G., A level 1 and a level 4 space station in orbit
 		}
 
-		self.construction_queue = []
+		self.construction_queue = []  # A list of keys of all construction projects assigned to the colony.
 
 		# Colony Storage
 		self.resource_storage = {
@@ -35,13 +36,17 @@ class Colony:
 			}
 		}
 
-	def add_buildings(self, building, index=0):
+	def update_construction(self, galaxy, empire):
+		for construction_project in self.construction_queue:
+			galaxy.construction_projects[construction_project].tick_construction(empire, self)
+
+	# GETTERS
+	def get_id(self):
+		return self.colony_id
+
+	# SETTERS
+	def add_buildings(self, building, index):
 		if building in self.quantity_buildings:
 			self.quantity_buildings[building] += 1
 		else:
 			self.quality_buildings[building][index] += 1
-
-	def update_construction(self):
-		for construction_project in self.construction_queue:
-			construction_project.tick_construction()
-

@@ -1,8 +1,8 @@
 class Empire:
 	def __init__(self, name, empire_id, **kwargs):
 		# Empire name and identification
-		self.empire_name = name
 		self.empire_id = empire_id
+		self.empire_name = name
 
 		# Empire modifiers and stats
 		self.modifiers = {
@@ -12,12 +12,15 @@ class Empire:
 		}
 
 		# Empire entities
-		self.colonies = {}
-		self.fleets = {}
+		self.colonies = []  # A list of id's of colonies
+		self.fleets = []  # See above for fleets.
 
 		self.__dict__.update(kwargs)
 
 	# GETTERS
+	def get_player_empire(self):
+		return self
+
 	def get_modifiers(self):
 		return self.modifiers
 
@@ -28,8 +31,8 @@ class Empire:
 		return self.fleets
 
 	# SETTERS
-	def add_fleet(self, fleet_id, fleet_object):
-		self.fleets[fleet_id] = fleet_object
+	def add_fleet(self, fleet_id):
+		self.fleets.append(fleet_id)
 
-	def add_colony(self, colony_id, colony_object):
-		self.colonies[colony_id] = colony_object
+	def add_colony(self, colony_id):
+		self.colonies.append(colony_id)
