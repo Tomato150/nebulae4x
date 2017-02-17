@@ -3,7 +3,7 @@ class ConstructionProject:
 		# General information
 		self.project_id = project_id
 		self.project_name = project_name  # Name of the project/What you are building
-		self.project_info = [project_info[0], project_info[1]]   # [What you are building, index for quality building]
+		self.project_info = [project_info[0], project_info[1]]   # [What you are building, installation/building]
 		self.project_cost = project_cost  # Individual resource cost per resource
 
 		currently_completed = {}
@@ -41,7 +41,7 @@ class ConstructionProject:
 
 		return remainder_CP, available_for_extra
 
-	def _check_for_built(self, empire, colony):
+	def _check_for_built(self, colony, galaxy):
 		self.currently_completed['total'] = 0
 		for key, value in self.currently_completed.items():
 			if key != 'total':
@@ -51,40 +51,43 @@ class ConstructionProject:
 			for key in self.currently_completed:
 				self.currently_completed[key] = 0
 			self.project_runs -= 1
-			colony.add_buildings(self.project_info[0], self.project_info[1])
+			colony.add_buildings(self.project_info[0], galaxy)
 			return True
 		else:
 			return False
 
-	def construction_tick(self, empire_instance, colony_instance):
-		# Get build points for the total phase of construction
-		total_CP = self.num_of_factories * empire_instance.modifiers['building_modifiers']['build_points'] / 365
-		total_CP_history = total_CP
-		available_for_extra_list = []
-
+	def construction_tick(self, empire_instance, colony_instance, galaxy):
 		# Apply what you can, get remainders
 		while True:
+			# Get build points for the total phase of construction
+			total_CP = self.num_of_factories * empire_instance.modifiers['building_modifiers']['build_points'] / 365
+			total_CP_history = total_CP
+			available_for_extra_list = []
+			# For each material, not including the total
 			for material, cost in self.project_cost.items():
 				if material != 'total':
+					# Get how much is allocated to the current material
 					CP_allocated = (cost * total_CP_history) / self.project_cost['total']
 					CP_to_finish = self.project_cost[material] - self.currently_completed[material]
 					total_CP -= CP_allocated
+					# Assign build points, get remainders and add back to pool.
 					remainder_CP, available_for_extra = self._assign_build_points(CP_allocated, CP_to_finish, material, colony_instance.resource_storage[material]['current'])
 					total_CP += remainder_CP
+					# Add to extra if available.
 					if available_for_extra:
 						available_for_extra_list.append(material)
 
 			# Check if it is built, then apply build points again if needed.
-			if self._check_for_built(empire_instance, colony_instance):
-				total_CP_history = total_CP
-			else:
+			if not self._check_for_built(colony_instance, galaxy):
 				break
 
 		# Use the remainders
 		while True:
+			# If 0 CP remains, break
 			if total_CP <= 0.0001:
 				break
 			available_for_extra_list_new = []
+			# For materials
 			for material in available_for_extra_list:
 				CP_allocated = total_CP / len(available_for_extra_list)
 				CP_to_finish = self.project_cost[material] - self.currently_completed[material]
@@ -93,4 +96,4 @@ class ConstructionProject:
 				if available_for_extra:
 					available_for_extra_list_new.append(material)
 			available_for_extra_list = available_for_extra_list_new
-			self._check_for_built(empire_instance, colony_instance)
+			self._check_for_built(colony_instance, galaxy)

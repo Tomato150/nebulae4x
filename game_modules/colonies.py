@@ -1,5 +1,6 @@
 from game_data.constants import colonies_constants as constants
 
+
 class Colony:
 	def __init__(self, colony_id, planet_id, empire_id):
 		# Colony Location and General information
@@ -8,18 +9,17 @@ class Colony:
 		self.parent_empire_id = empire_id
 
 		# Colony Type information
-		self.colony_type = 'mixed'
+		self.colony_type = 'mixed'  # Military, Mixed, Civilian
 
 		# Colony buildings information
-		self.quantity_buildings = {
+		self.buildings = {
 			# Quantity buildings (Can keep expanding more facilities)
 			'mines': 100,
 			'factories': 100,
 		}
-		self.quality_buildings = {
-			# Lists of buildings, each having a level
-			# These are for buildings where having a 'backup' may be good in case of attacks/necessity
-			'space_stations': [1, 4]  # E.G., A level 1 and a level 4 space station in orbit
+		self.installations = {
+			# The are buildings that have instances attached with special and unique stats for each building.
+			# 'name': id
 		}
 
 		self.construction_queue = []  # A list of keys of all construction projects assigned to the colony.
@@ -45,8 +45,18 @@ class Colony:
 		return self.colony_id
 
 	# SETTERS
-	def add_buildings(self, building, index):
-		if building in self.quantity_buildings:
-			self.quantity_buildings[building] += 1
+	def add_buildings(self, building, galaxy):
+		if type(building) == str:
+			self.buildings[building] += 1
 		else:
-			self.quality_buildings[building][index] += 1
+			galaxy.add_objects({'installations': building})
+			self.installations[building.name] = building.id
+
+
+class Installation:
+	def __init__(self, name, installation_id):
+		# General information and identification of the installation.
+		self.name = name
+		self.id = installation_id
+
+		self.stats = {}

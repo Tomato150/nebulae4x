@@ -37,6 +37,7 @@ class Galaxy:
 			'planets': {},
 			'empires': {},
 			'colonies': {},
+			'installations': {},
 			'construction_projects': {},
 			'fleets': {},
 			'ships': {}
@@ -47,6 +48,7 @@ class Galaxy:
 			'planets': 0,
 			'empires': 0,
 			'colonies': 0,
+			'installations': 0,
 			'construction_projects': 0,
 			'fleets': 0,
 			'ships': 0
@@ -203,7 +205,7 @@ class Galaxy:
 			return_dict = {}
 			for object_wanted in objects:
 				return_dict[object_wanted] = self.galaxy_creation_parameters[object_wanted]
-			return_dict
+			return return_dict
 
 	# SETTERS
 	def add_objects(self, objects):
@@ -255,6 +257,8 @@ class TerrestrialBody:
 		# Planet parent body relevant information
 		self.parent_star_id = star_id
 		self.orbit_index = orbit_index  # 0, 1, 2 ... n
+		self.orbital_distance = 1.4  # Radius from the center.
+		self.eccentricity = 0
 
 		# Planet Type information
 		self.planet_type = 'terrestrial'
