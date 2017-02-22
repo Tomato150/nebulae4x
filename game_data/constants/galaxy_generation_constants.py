@@ -8,3 +8,6 @@ STARS = (
 		['Red Super Giant', ['/static/images/stars/R_SG_1.png']],
 		['Yellow Main', ['/static/images/stars/Y_M_1.png']]
 	),
+
+GRAV_CONSTANT = 6.67 * (10 ** -11)
+INVERSE_GRAV_CONSTANT = 1 / GRAV_CONSTANT

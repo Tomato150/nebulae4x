@@ -33,7 +33,7 @@ var world_object = (function () {
         'main_menu_header_title': $('#main-menu-header-title'),
 
         // Pixi.js Canvas display information
-        'currently_viewing': 'local_system_canvas',
+        'currently_viewing': 'galaxy_canvas',
         'canvas': $('#canvas'),
 
         // DragScroll
@@ -69,32 +69,13 @@ var world_object = (function () {
         config.canvas.attr(attribute_list);
     }
 
-    function _init() {
-
-        $.ajax({
-            type: 'GET',
-            url: '/get_stars',
-            dataType: 'json',
-            contentType: 'application/json',
-            success: function (server_data) {
-                $.extend(config, server_data);
-            },
-            error: function (xhr, ajaxOptions, thrownError) {alert('Error: Unable to load page: ' + thrownError);}
-        });
+    function _init(server_data) {
+        $.extend(config, server_data);
 
         _size_windows();
 
-        loader.add('/static/images/stars/B_D_1.png')
-            .add('/static/images/stars/B_G_1.png')
-            .add('/static/images/stars/B_M_1.png')
-            .add('/static/images/stars/R_D_1.png')
-            .add('/static/images/stars/R_G_1.png')
-            .add('/static/images/stars/R_M_1.png')
-            .add('/static/images/stars/R_SG_1.png')
-            .add('/static/images/stars/Y_M_1.png')
-            .load(_setup);
-
         config.renderer = autoDetectRenderer(config.canvas_size, config.canvas_size, {view: config.canvas[0]});
+
         config.stage = new Container();
         config.galaxy_non_star_container = new Container();
         config.galaxy_star_container = new Container();
@@ -105,6 +86,16 @@ var world_object = (function () {
         config.stage.addChild(config.galaxy_non_star_container);
         config.stage.addChild(config.local_system_body_container);
         config.stage.addChild(config.local_system_other_container);
+
+        loader.add('/static/images/stars/B_D_1.png')
+            .add('/static/images/stars/B_G_1.png')
+            .add('/static/images/stars/B_M_1.png')
+            .add('/static/images/stars/R_D_1.png')
+            .add('/static/images/stars/R_G_1.png')
+            .add('/static/images/stars/R_M_1.png')
+            .add('/static/images/stars/R_SG_1.png')
+            .add('/static/images/stars/Y_M_1.png')
+            .load(_setup);
     }
 
     function _setup() {
@@ -176,6 +167,10 @@ var world_object = (function () {
         config.main_menu_div.removeAttr('hidden')
     }
 
+    function _set_view_for(view_target) {
+        config.currently_viewing = view_target;
+    }
+
     function _get_config() {
         return config;
     }
@@ -183,6 +178,7 @@ var world_object = (function () {
     return {
         init: _init,
         set_menu_for: _set_menu_for,
+        set_view_for: _set_view_for,
         get_config: _get_config
     }
 })();

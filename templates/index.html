@@ -17,10 +17,14 @@
     <nav class="navbar navbar-toggleable-md fixed-top navbar-inverse bg-inverse" style="background-color: rgba(0, 0, 0, 0.75) !important;">
         <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbar_content"><span class="navbar-toggler-icon"></span></button>
         <a class="navbar-brand" href="#" id="main-menu-div-toggle">Menu</a>
-        <div id="navbar_content" class="collapse navbar-collapse" style="display: inline-block">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item"><a class="nav-link navbar-link" data-window-target="empire-menu" href="#">Empire Overview</a></li>
-                <li class="nav-item"><a class="nav-link navbar-link" data-window-target="system-menu" href="#">System Overview</a></li>
+        <div id="navbar_content" class="collapse navbar-collapse" style="display: block">
+            <ul class="navbar-nav mr-auto" style="">
+                <li class="nav-item"><a class="nav-link navbar-menu-popover" data-window-target="empire-menu" href="#">Empire Overview</a></li>
+                <li class="nav-item"><a class="nav-link navbar-menu-popover" data-window-target="system-menu" href="#">System Overview</a></li>
+            </ul>
+            <ul class="float-right navbar-nav mr-auto" style="margin: 0 !important;">
+                <li class="nav-item"><a class="nav-link navbar-view-toggle" data-view-target="galaxy_canvas" href="#">Galaxy Viewer</a></li>
+                <li class="nav-item"><a class="nav-link navbar-view-toggle" data-view-target="local_system_canvas" href="#">Local System Viewer</a></li>
             </ul>
         </div>
     </nav>
@@ -160,7 +164,17 @@
         $(document).ready(function () {
             var world = world_object;
             var handlers = handler_object;
-            world.init();
+
+            $.ajax({
+                type: 'GET',
+                url: '/get_stars',
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function (server_data) {
+                    world.init(server_data);
+                },
+                error: function (xhr, ajaxOptions, thrownError) {alert('Error: Unable to load page: ' + thrownError);}
+            });
 
             $(document).on('mousewheel', function (e) {handlers.mouse_scroll(e, world);});
 
@@ -186,12 +200,18 @@
                 $('#main-menu-div').attr({'hidden': ''})
             });
             
-            $(document).on('click', '.navbar-link', function (e) {
+            $(document).on('click', '.navbar-menu-popover', function (e) {
                 e.preventDefault();
                 var data_window_target = $(this).data('window-target');
                 world.set_menu_for(data_window_target)
-            })
-        })
+            });
+
+            $(document).on('click', '.navbar-view-toggle', function (e) {
+                e.preventDefault();
+                var view_target = $(this).data('view-target');
+                world.set_view_for(view_target)
+            });
+        });
     </script>
 </body>
 </html>
