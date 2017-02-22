@@ -1,12 +1,16 @@
-from game_data.constants import colonies_constants as constants
-
-
 class Colony:
-	def __init__(self, colony_id, planet_id, empire_id):
+	def __init__(self, colony_id, name, planet_instance, empire_instance):
 		# Colony Location and General information
-		self.colony_id = colony_id
-		self.parent_planet_id = planet_id
-		self.parent_empire_id = empire_id
+		self.id = colony_id
+		self.name = name
+
+		#Parent ID's
+		self.parent_ids = {
+			'star': planet_instance.parent_ids['star'],
+			'planet': planet_instance.id,
+
+			'empire': empire_instance.id
+		}
 
 		# Colony Type information
 		self.colony_type = 'mixed'  # Military, Mixed, Civilian
@@ -22,7 +26,7 @@ class Colony:
 			# 'name': id
 		}
 
-		self.construction_queue = []  # A list of keys of all construction projects assigned to the colony.
+		self.construction_queue = {}  # A dict of {id's: instance} of all construction projects assigned to the colony.
 
 		# Colony Storage
 		self.resource_storage = {

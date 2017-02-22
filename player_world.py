@@ -1,24 +1,21 @@
 # The file for the handling of game code.
-from game_modules import colonies, construction, empires, galaxy_generation
+from game_modules.stellar_objects import galaxy
 
 
 class PlayerWorld:
 	def __init__(self):
-		self.galaxy = galaxy_generation.Galaxy()
+		# The Galaxy Object is the base container for all other objects in the game.
+		self.galaxy = galaxy.Galaxy()
+		self.galaxy.generate_galaxy()
+		self.player_command_mapping = {
+			'start_construction'
+		}
 
 	def generate_player_empire(self):
-		counters = self.galaxy.get_id_counter(['empires', 'colonies', 'planets'],)
-		empire = empires.Empire('Player Empire', counters['empires'])
-		colony = colonies.Colony(counters['colonies'], '0', counters['empires'])
-		planet = galaxy_generation.TerrestrialBody(counters['planets'], 'Earth', '0', 0)
+		pass
 
-		# Add all local references
-		self.galaxy.get_objects('stars')['0'].add_planet(counters['planets'])
-		planet.add_colony(counters['colonies'])
-		empire.add_colony(colony.get_id())
-
-		# Add to global lists.
-		self.galaxy.add_objects({'empires': empire, 'colonies': colony, 'planets': planet})
+	def handle_player_input(self, commands):
+		pass
 
 	# GETTERS
 	def get_all_objects(self):
@@ -32,4 +29,3 @@ class PlayerWorld:
 
 
 player_world = PlayerWorld()
-player_world.generate_player_empire()

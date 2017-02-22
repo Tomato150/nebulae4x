@@ -1,19 +1,7 @@
-from game_data.constants import galaxy_generation_constants as constants, general_constants
+from game_modules.stellar_objects import stars, planets
 
-from random import randint, random, uniform, choice
+import random
 import math
-
-
-def name_creator(mini, maxi, syl):
-	name = ""
-	for i in range(0, syl):
-		name = name + choice(general_constants.CONSONANTS)
-		for j in range(1, randint(mini, maxi)):
-			if name[i-1] in general_constants.CONSONANTS:
-				name = name + choice(general_constants.VOWELS)
-			else:
-				name = name + choice(general_constants.CONSONANTS)
-	return name.capitalize()
 
 
 class Galaxy:
@@ -32,15 +20,10 @@ class Galaxy:
 
 		self.star_quadrants = {}
 
+		# Dicts of {id's: instances} for stars and empires.
 		self.world_objects = {
 			'stars': {},
-			'planets': {},
-			'empires': {},
-			'colonies': {},
-			'installations': {},
-			'construction_projects': {},
-			'fleets': {},
-			'ships': {}
+			'empires': {}
 		}
 
 		self.world_objects_id = {
@@ -54,8 +37,6 @@ class Galaxy:
 			'ships': 0
 		}
 
-		self.generate_galaxy()
-
 	def generate_galaxy(self):
 		bounds = [int(self.galaxy_creation_parameters['size_of_canvas'] / 20 * -1), int(self.galaxy_creation_parameters['size_of_canvas'] / 20)]
 		for x in range(bounds[0], bounds[1]):
@@ -66,18 +47,18 @@ class Galaxy:
 		while True:
 
 			# Get distance from galactic center
-			distance = random() ** 2
+			distance = random.random() ** 2
 
 			if not distance < self.galaxy_creation_parameters['galactic_center_cutoff']:
 
 				# Get angle based on unit circle
-				angle = random() * 2 * math.pi
-				arm_offset = random() * self.galaxy_creation_parameters['arms_offset_max']
+				angle = random.random() * 2 * math.pi
+				arm_offset = random.random() * self.galaxy_creation_parameters['arms_offset_max']
 				arm_offset -= self.galaxy_creation_parameters['arms_offset_max'] / 2
 				arm_offset *= (1 / distance)
 
 				if self.world_objects_id['stars'] % 2 == 0 or self.world_objects_id['stars'] % 3 == 0:
-					squared_arm_offset = arm_offset ** 2 + (uniform(-1, 1) / 5)
+					squared_arm_offset = arm_offset ** 2 + (random.uniform(-1, 1) / 5)
 				else:
 					squared_arm_offset = arm_offset ** 2
 				if arm_offset < 0:
@@ -94,11 +75,11 @@ class Galaxy:
 
 				# Random Offset
 				if self.world_objects_id['stars'] % self.galaxy_creation_parameters['x_y_rand_offset'] == 0:
-					offset_star_x = 20 * self.galaxy_creation_parameters['x_y_rand_offset'] * uniform(-1, 1)
-					offset_star_y = 20 * self.galaxy_creation_parameters['x_y_rand_offset'] * uniform(-1, 1)
+					offset_star_x = 20 * self.galaxy_creation_parameters['x_y_rand_offset'] * random.uniform(-1, 1)
+					offset_star_y = 20 * self.galaxy_creation_parameters['x_y_rand_offset'] * random.uniform(-1, 1)
 				else:
-					offset_star_x = self.galaxy_creation_parameters['x_y_rand_offset'] * uniform(-1, 1)
-					offset_star_y = self.galaxy_creation_parameters['x_y_rand_offset'] * uniform(-1, 1)
+					offset_star_x = self.galaxy_creation_parameters['x_y_rand_offset'] * random.uniform(-1, 1)
+					offset_star_y = self.galaxy_creation_parameters['x_y_rand_offset'] * random.uniform(-1, 1)
 
 				star_x += offset_star_x
 				star_y += offset_star_y
@@ -153,9 +134,9 @@ class Galaxy:
 				# Appending to right dictionary
 				if not star_collision:
 					if star_x == 0 and star_y == 0:
-						star_object = Star(str(self.world_objects_id['stars']), star_x, star_y, name='Sol')
+						star_object = stars.Star(str(self.world_objects_id['stars']), star_x, star_y, name='Sol')
 					else:
-						star_object = Star(str(self.world_objects_id['stars']), star_x, star_y)
+						star_object = stars.Star(str(self.world_objects_id['stars']), star_x, star_y)
 					self.star_quadrants[str(quadrant_x)][str(quadrant_y)][str(self.world_objects_id['stars'])] = star_object
 					self.world_objects['stars'][str(self.world_objects_id['stars'])] = star_object
 
@@ -213,77 +194,3 @@ class Galaxy:
 		for object_type, object_instance in objects.items():
 			self.world_objects[object_type][str(self.world_objects_id[object_type])] = object_instance
 			self.world_objects_id[object_type] += 1
-
-
-class Star:
-	def __init__(self, star_id, x, y, **kwargs):
-		# System General information
-		self.star_id = star_id
-		self.name = name_creator(randint(2, 3), randint(3, 5), randint(1, 2))
-
-		# System Location Information
-		self.coordinates = [int(x), int(y)]
-
-		# Star type information
-		star = choice(constants.STARS[0])
-		self.star_type = star[0]
-		self.file_path = choice(star[1])
-
-		# System Contents information:
-		self.planets = []  # A list of planet keys.
-
-		# Update kwargs
-		self.__dict__.update(kwargs)
-
-	# GETTERS:
-	def get_coordinates(self):
-		# [x, y]
-		return self.coordinates
-
-	def get_id(self):
-		return self.star_id
-
-	# SETTERS:
-	def add_planet(self, planet_id):
-		self.planets.append(planet_id)
-
-
-class TerrestrialBody:
-	def __init__(self, planet_id, name, star_id, orbit_index, **kwargs):
-		# Planet Location and General Information
-		self.planet_id = planet_id
-		self.name = name
-
-		# Planet parent body relevant information
-		self.parent_star_id = star_id
-		self.orbit_index = orbit_index  # 0, 1, 2 ... n
-		self.orbital_distance = 1.4  # Radius from the center.
-		self.eccentricity = 0
-
-		# Planet Type information
-		self.planet_type = 'terrestrial'
-		self.file_path = '/path/to/file.png'
-
-		# Planet contents information
-		self.colonies = []  # A list of planet keys.
-		self.resources = {
-			'water': {
-				'amount': 999999999999,  # 999,999,999,999
-				'availability': 1
-			},
-			'build_materials': {
-				'amount': 999999999999,  # 999,999,999,999
-				'availability': 1
-			},
-		}
-
-		# **kwarg update
-		self.__dict__.update(kwargs)
-
-	# GETTERS
-	def get_colonies(self):
-		return self.colonies
-
-	# SETTERS
-	def add_colony(self, colony_id):
-		self.colonies.append(colony_id)

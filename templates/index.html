@@ -162,8 +162,6 @@
             var handlers = handler_object;
             world.init();
 
-
-
             $(document).on('mousewheel', function (e) {handlers.mouse_scroll(e, world);});
 
             $(document).on('mousedown', '#canvas', function (e) {handlers.canvas_mouse_click(e, world);});

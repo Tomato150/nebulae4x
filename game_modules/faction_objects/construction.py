@@ -1,8 +1,19 @@
 class ConstructionProject:
-	def __init__(self, project_id, project_name, project_info, project_cost, project_runs, num_of_factories):
+	def __init__(self, project_id, project_name, parent_colony_instance, project_info, project_cost, project_runs, num_of_factories):
 		# General information
-		self.project_id = project_id
-		self.project_name = project_name  # Name of the project/What you are building
+		self.id = project_id
+		self.name = project_name  # Name of the project/What you are building
+
+		# Parent Id's
+		self.parent_ids = {
+			'star': parent_colony_instance.parent_ids['star'],
+			'planet': parent_colony_instance.parent_ids['planet'],
+
+			'empire': parent_colony_instance.parent_ids['empire'],
+			'colony': parent_colony_instance.id
+		}
+
+		# Project Info
 		self.project_info = [project_info[0], project_info[1]]   # [What you are building, installation/building]
 		self.project_cost = project_cost  # Individual resource cost per resource
 
@@ -56,8 +67,11 @@ class ConstructionProject:
 		else:
 			return False
 
-	def construction_tick(self, empire_instance, colony_instance, galaxy):
+	def construction_tick(self, galaxy):
 		# Apply what you can, get remainders
+
+		empire_instance = galaxy.world_objects[self.parent_ids['empire']]
+		colony_instance = empire_instance[self.parent_ids['colony']]
 		while True:
 			# Get build points for the total phase of construction
 			total_CP = self.num_of_factories * empire_instance.modifiers['building_modifiers']['build_points'] / 365

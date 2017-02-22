@@ -13,14 +13,7 @@ var world_object = (function () {
     var config = {
         // Calculation based information
         'stars': null,
-        'planets': null,
-
         'empires': null,
-        'colonies': null,
-        'construction_projects': null,
-
-        'fleets': null,
-        'ships': null,
 
         'player_empire': null,
         'selected_star': null,
@@ -103,17 +96,15 @@ var world_object = (function () {
 
         config.renderer = autoDetectRenderer(config.canvas_size, config.canvas_size, {view: config.canvas[0]});
         config.stage = new Container();
-        config.stage_container = new Container();
         config.galaxy_non_star_container = new Container();
         config.galaxy_star_container = new Container();
         config.local_system_body_container = new Container();
         config.local_system_other_container = new Container();
 
-        config.stage_container.addChild(config.galaxy_star_container);
-        config.stage_container.addChild(config.galaxy_non_star_container);
-        config.stage_container.addChild(config.local_system_body_container);
-        config.stage_container.addChild(config.local_system_other_container);
-        config.stage.addChild(config.stage_container);
+        config.stage.addChild(config.galaxy_star_container);
+        config.stage.addChild(config.galaxy_non_star_container);
+        config.stage.addChild(config.local_system_body_container);
+        config.stage.addChild(config.local_system_other_container);
     }
 
     function _setup() {
@@ -136,10 +127,12 @@ var world_object = (function () {
             config.galaxy_non_star_container.scale.y = config.scroll_factor;
             config.galaxy_star_container.scale.x = config.scroll_factor / 32;
             config.galaxy_star_container.scale.y = config.scroll_factor / 32;
+
             config.galaxy_non_star_container.x = -(config.container_pan_x);
             config.galaxy_non_star_container.y = -(config.container_pan_y);
             config.galaxy_star_container.x = -(config.container_pan_x);
             config.galaxy_star_container.y = -(config.container_pan_y);
+
             config.local_system_body_container.visible = false;
             config.local_system_other_container.visible = false;
             config.galaxy_non_star_container.visible = false;
@@ -154,13 +147,8 @@ var world_object = (function () {
         if (config.currently_viewing == 'galaxy_canvas') {
             config.local_system_body_container.visible = false;
             config.local_system_other_container.visible = false;
-            if (config.scroll_factor < 24) {
-                config.galaxy_non_star_container.visible = false;
-                config.galaxy_star_container.visible = true;
-            } else {
-                config.galaxy_non_star_container.visible = true;
-                config.galaxy_star_container.visible = true;
-            }
+            config.galaxy_star_container.visible = true;
+            config.galaxy_non_star_container.visible = (config.scroll_factor > 24);
         } else if (config.currently_viewing == 'local_system_canvas') {
             config.galaxy_non_star_container.visible = false;
             config.galaxy_star_container.visible = false;

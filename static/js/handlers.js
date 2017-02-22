@@ -27,6 +27,7 @@ var handler_object = (function () {
         config.galaxy_non_star_container.scale.y = config.scroll_factor;
         config.galaxy_star_container.scale.x = config.scroll_factor / 32;
         config.galaxy_star_container.scale.y = config.scroll_factor / 32;
+
         config.galaxy_non_star_container.x = -(config.container_pan_x);
         config.galaxy_non_star_container.y = -(config.container_pan_y);
         config.galaxy_star_container.x = -(config.container_pan_x);
@@ -64,9 +65,11 @@ var handler_object = (function () {
         var config = world.get_config();
         console.log(Math.floor((config.container_pan_x + config.mouse_x) / config.scroll_factor - (config.canvas_size / 2)));
         console.log(-Math.floor((config.container_pan_y + config.mouse_y) / config.scroll_factor - (config.canvas_size / 2)));
+
         var x_coord = Math.floor((config.container_pan_x + config.mouse_x) / config.scroll_factor - (config.canvas_size / 2));
         var y_coord = -Math.floor((config.container_pan_y + config.mouse_y) / config.scroll_factor - (config.canvas_size / 2));
         var old_star = config.selected_star;
+
         for (var star_inx in config.stars) {
             if (old_star == config.selected_star) {
                 // Star selected.
@@ -88,8 +91,10 @@ var handler_object = (function () {
 
             config.mouse_scroll_x = 0 - newX + config.mouse_x;
             config.mouse_scroll_y = 0 - newY + config.mouse_y;
+
             config.galaxy_non_star_container.x = -(config.container_pan_x + config.mouse_scroll_x);
             config.galaxy_non_star_container.y = -(config.container_pan_y + config.mouse_scroll_y);
+
             config.galaxy_star_container.x = -(config.container_pan_x + config.mouse_scroll_x);
             config.galaxy_star_container.y = -(config.container_pan_y + config.mouse_scroll_y);
         }
@@ -100,6 +105,7 @@ var handler_object = (function () {
         config.down = false;
         if (config.moved){
             config.moved = false;
+
             config.container_pan_x = (config.container_pan_x + config.mouse_scroll_x);
             config.container_pan_y = (config.container_pan_y + config.mouse_scroll_y);
         }
