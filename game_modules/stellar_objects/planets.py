@@ -1,11 +1,12 @@
 class TerrestrialBody:
 	def __init__(self, planet_id, name, star_id, orbit_index, **kwargs):
 		# Planet Location and General Information
-		self.id = planet_id
 		self.name = name
 
 		# Planet parent body relevant information
 		self.parent_ids = {
+			'self': planet_id,
+
 			'star': star_id
 		}
 		self.orbit_index = orbit_index  # 0, 1, 2 ... n

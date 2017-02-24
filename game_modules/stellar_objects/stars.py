@@ -1,25 +1,15 @@
+from game_modules import utility_functions
+
 from game_data.constants import galaxy_generation_constants as constants, general_constants
 
 import random
-
-
-def name_creator(mini, maxi, syl):
-	name = ""
-	for i in range(0, syl):
-		name = name + random.choice(general_constants.CONSONANTS)
-		for j in range(1, random.randint(mini, maxi)):
-			if name[i-1] in general_constants.CONSONANTS:
-				name = name + random.choice(general_constants.VOWELS)
-			else:
-				name = name + random.choice(general_constants.CONSONANTS)
-	return name.capitalize()
 
 
 class Star:
 	def __init__(self, star_id, x, y, **kwargs):
 		# System General information
 		self.id = star_id
-		self.name = name_creator(random.randint(2, 3), random.randint(3, 5), random.randint(1, 2))
+		self.name = utility_functions.name_creator(random.randint(2, 3), random.randint(3, 5), random.randint(1, 2))
 
 		# System Location Information
 		self.coordinates = [int(x), int(y)]
@@ -39,9 +29,6 @@ class Star:
 	def get_coordinates(self):
 		# [x, y]
 		return self.coordinates
-
-	def get_id(self):
-		return self.star_id
 
 	# SETTERS:
 	def add_planet(self, planet_id):

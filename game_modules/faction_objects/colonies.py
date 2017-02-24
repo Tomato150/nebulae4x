@@ -6,6 +6,8 @@ class Colony:
 
 		#Parent ID's
 		self.parent_ids = {
+			'self': colony_id,
+
 			'star': planet_instance.parent_ids['star'],
 			'planet': planet_instance.id,
 
@@ -26,7 +28,7 @@ class Colony:
 			# 'name': id
 		}
 
-		self.construction_queue = {}  # A dict of {id's: instance} of all construction projects assigned to the colony.
+		self.construction_projects = {}  # A dict of {id's: instance} of all construction projects assigned to the colony.
 
 		# Colony Storage
 		self.resource_storage = {

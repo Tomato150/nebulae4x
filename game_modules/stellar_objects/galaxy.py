@@ -167,12 +167,16 @@ class Galaxy:
 		# Objects = 'object' OR ['object', 'object', ...]
 		if type(objects) == str:
 			if objects.lower() == 'all':
+				for object_type in self.world_objects_id:
+					self.world_objects_id[object_type] += 1
 				return self.world_objects_id
 			else:
+				self.world_objects_id[objects] += 1
 				return self.world_objects_id[objects]
 		else:
 			return_dict = {}
 			for object_wanted in objects:
+				self.world_objects_id[objects] += 1
 				return_dict[object_wanted] = self.world_objects_id[object_wanted]
 			return return_dict
 
@@ -188,9 +192,5 @@ class Galaxy:
 				return_dict[object_wanted] = self.galaxy_creation_parameters[object_wanted]
 			return return_dict
 
-	# SETTERS
-	def add_objects(self, objects):
-		# Objects = {'object_type': object_instance, 'object_type': object_instance, ...}
-		for object_type, object_instance in objects.items():
-			self.world_objects[object_type][str(self.world_objects_id[object_type])] = object_instance
-			self.world_objects_id[object_type] += 1
+	def get_object_by_id_chain(self, id_chain, object_type):
+		pass

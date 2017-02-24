@@ -9,6 +9,14 @@ import pickle
 import datetime
 
 
+class PlayerEvent:
+	def __init__(self, name, args):
+		self.name = name
+		self.args = []
+		for arg in args:
+			self.args.append(arg)
+
+
 # JSON default argument for nested objects
 def to_json(obj):
 	try:
@@ -70,6 +78,18 @@ def get_stars():
 	return_vals.update({'canvas_size': player_world.get_canvas_size()})
 
 	return json.dumps(return_vals, default=to_json)
+
+
+@app.route('/commands_to_server', methods=['POST'])
+def commands_to_server():
+	client_data = request.get_json()
+	events = []
+	for event in client_data:
+		events.append(PlayerEvent(event['name'], event['args']))
+
+	refresh_list = player_world.handle_player_input(events)
+
+	return json.dumps(refresh_list)
 
 if __name__ == '__main__':
 	app.run(host='0.0.0.0')

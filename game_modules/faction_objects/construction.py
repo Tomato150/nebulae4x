@@ -1,11 +1,11 @@
 class ConstructionProject:
 	def __init__(self, project_id, project_name, parent_colony_instance, project_info, project_cost, project_runs, num_of_factories):
 		# General information
-		self.id = project_id
 		self.name = project_name  # Name of the project/What you are building
 
 		# Parent Id's
-		self.parent_ids = {
+		self.ids = {
+			'self': project_id,
 			'star': parent_colony_instance.parent_ids['star'],
 			'planet': parent_colony_instance.parent_ids['planet'],
 
@@ -111,3 +111,6 @@ class ConstructionProject:
 					available_for_extra_list_new.append(material)
 			available_for_extra_list = available_for_extra_list_new
 			self._check_for_built(colony_instance, galaxy)
+
+	def remove_construction(self, galaxy, colony_ids):
+		pass

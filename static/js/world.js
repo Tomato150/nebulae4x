@@ -175,6 +175,25 @@ var world_object = (function () {
         return config;
     }
 
+    function _post_commands_to_server() {
+        $.ajax({
+            type: 'POST',
+            url: '/commands_to_server',
+            dataType: 'json',
+            contentType: 'application/json',
+            success: function (server_data) {
+                // Fill in for the refresh shit.
+                for (var empire in server_data['empires']) {
+                    $.extend(config.empires[empire.id], empire)
+                }
+                for (var star in server_data['stars']) {
+                    $.extend(config.stars[star.id], star)
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {alert('Error: Unable to load page: ' + thrownError);}
+        });
+    }
+
     return {
         init: _init,
         set_menu_for: _set_menu_for,
