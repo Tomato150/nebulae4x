@@ -6,7 +6,7 @@ import random
 
 
 class Star:
-	def __init__(self, star_id, x, y, **kwargs):
+	def __init__(self, star_id, x, y, galaxy, **kwargs):
 		# System General information
 		self.id = star_id
 		self.name = utility_functions.name_creator(random.randint(2, 3), random.randint(3, 5), random.randint(1, 2))
@@ -24,6 +24,14 @@ class Star:
 
 		# Update kwargs
 		self.__dict__.update(kwargs)
+
+		galaxy.world_objects['stars'][self.id] = self
+
+	def generate_planets(self, galaxy, amount='random'):
+		if amount == 'random':
+			amount = random.randint(0, 8)
+		for i in range(0, amount):
+			galaxy.create_new_planet(self, self.name, len(self.planets))
 
 	# GETTERS:
 	def get_coordinates(self):

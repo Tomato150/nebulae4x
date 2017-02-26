@@ -1,15 +1,14 @@
 class Colony:
-	def __init__(self, colony_id, name, planet_instance, empire_instance):
+	def __init__(self, colony_id, name, planet_instance, empire_instance, **kwargs):
 		# Colony Location and General information
-		self.id = colony_id
 		self.name = name
 
 		#Parent ID's
-		self.parent_ids = {
+		self.ids = {
 			'self': colony_id,
 
-			'star': planet_instance.parent_ids['star'],
-			'planet': planet_instance.id,
+			'star': planet_instance.ids['star'],
+			'planet': planet_instance.ids['self'],
 
 			'empire': empire_instance.id
 		}
@@ -32,23 +31,18 @@ class Colony:
 
 		# Colony Storage
 		self.resource_storage = {
-			'water': {
-				'max': 999999999999,
-				'current': 999999999
-			},
-			'building_materials': {
-				'max': 999999999999,
-				'current': 999999
-			}
+			'water': 999999999,
+			'building_materials': 999999999999
 		}
 
-	def update_construction(self, galaxy, empire):
-		for construction_project in self.construction_queue:
-			galaxy.construction_projects[construction_project].tick_construction(empire, self)
+		self.__dict__.update(kwargs)
 
-	# GETTERS
-	def get_id(self):
-		return self.colony_id
+		empire_instance.colonies[self.ids['self']] = self
+		planet_instance.colonies[self.ids['self']] = self
+
+	def update_construction(self, galaxy, empire):
+		for construction_project in self.construction_projects:
+			galaxy.construction_projects[construction_project].tick_construction(empire, self)
 
 	# SETTERS
 	def add_buildings(self, building, galaxy):

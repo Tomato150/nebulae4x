@@ -40,7 +40,7 @@
                 </div>
             </div>
 
-            <div id="main-menu-empire-screen">
+            <div id="main-menu-empire-screen" hidden>
                 <div class="row">
                     <div id="empire-pill-navs" class="col-xl-12">
                         <ul class="nav nav-pills justify-content-center">
@@ -110,10 +110,116 @@
             </div>
 
             <div id="main-menu-system-screen">
+                <div class="row">
+                    <div id="system-pill-navs" class="col-xl-12">
+                        <ul class="nav nav-pills justify-content-center">
+                            <!-- <li class="nav-item"><a href="#" class="nav-link" data-toggle="tab" role="tab"></a></li> -->
+                            <li class="nav-item"><a href="#system-overview" class="nav-link active" data-toggle="tab" role="tab">Overview</a></li>
+                            <li class="nav-item"><a href="#system-economy" class="nav-link" data-toggle="tab" role="tab">Economy</a></li>
+                            <li class="nav-item"><a href="#system-industry" class="nav-link" data-toggle="tab" role="tab">Industry</a></li>
+                            <li class="nav-item"><a href="#system-fleets" class="nav-link" data-toggle="tab" role="tab">Fleets</a></li>
+                            <li class="nav-item"><a href="#system-population" class="nav-link" data-toggle="tab" role="tab">Population</a></li>
+                            <li class="nav-item"><a href="#system-politics" class="nav-link" data-toggle="tab" role="tab">Politics</a></li>
+                            <li class="nav-item"><a href="#system-diplomacy" class="nav-link" data-toggle="tab" role="tab">Diplomacy</a></li>
+                            <li class="nav-item"><a href="#system-research" class="nav-link" data-toggle="tab" role="tab">Research</a></li>
+                        </ul>
 
+                        <div class="spacer-lg"></div>
+                    </div>
+
+                    <div id="system-colony-selector-div" class="col-xl-2">
+                        <div>
+                            <h1>Colony Selector</h1>
+                            <hr>
+                            <table id="system-colony-table" class="table table-striped table-hover table-sm">
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="system-pill-contents" class="col-xl-10">
+                        <div class="tab-content">
+                            <!-- <div id="" class="tab-pane" role="tabpanel"></div> -->
+                            <div id="system-overview" class="tab-pane active" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-xl-12">
+                                        <h1>System Overview Tab</h1>
+                                        <p>Useless information about System Stuff should go about ... Here</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="system-economy" class="tab-pane" role="tabpanel">
+                                <h1>System Economy Tabpanel</h1>
+                                <p>Useless information should go about ... Here</p>
+                                <row>
+                                    <div class="col-xl-6">
+                                        <table class="table table-hover table-striped table-sm">
+                                            <thead>
+                                            <tr>
+                                                <th>Resource</th>
+                                                <th>Amount</th>
+                                                <th>Max</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="colony-resources-table">
+                                            <tr>
+                                                <td>Water</td>
+                                                <td>100</td>
+                                                <td>1000</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Building Materials</td>
+                                                <td>100</td>
+                                                <td>1000</td>
+                                            </tr>
+                                            </tbody>
+                                            <tbody>
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </row>
+                            </div>
+
+                            <div id="system-industry" class="tab-pane" role="tabpanel">
+                                <h1>System Industry Tabpanel</h1>
+                                <p>Useless information should go about ... Here</p>
+                            </div>
+
+                            <div id="system-fleets" class="tab-pane" role="tabpanel">
+                                <h1>System Fleets Tabpanel</h1>
+                                <p>Useless information should go about ... Here</p>
+                            </div>
+
+                            <div id="system-population" class="tab-pane" role="tabpanel">
+                                <h1>System Population Tabpanel</h1>
+                                <p>Useless information should go about ... Here</p>
+                            </div>
+
+                            <div id="system-politics" class="tab-pane" role="tabpanel">
+                                <h1>System Politics Tabpanel</h1>
+                                <p>Useless information should go about ... Here</p>
+                            </div>
+
+                            <div id="system-diplomacy" class="tab-pane" role="tabpanel">
+                                <h1>System Diplomacy Tabpanel</h1>
+                                <p>Useless information should go about ... Here</p>
+                            </div>
+
+                            <div id="system-research" class="tab-pane" role="tabpanel">
+                                <h1>System Research Tabpanel</h1>
+                                <p>Useless information should go about ... Here</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+
+
 
     <div id="viewport" class="" style="position: fixed; overflow: hidden; height: 100vh; width: 100vw;">
         <canvas id="canvas"></canvas>
@@ -165,6 +271,11 @@
             var world = world_object;
             var handlers = handler_object;
 
+            function Command(name, args) {
+                this.name = name;
+                this.args = args;
+            }
+
             $.ajax({
                 type: 'GET',
                 url: '/get_stars',
@@ -211,6 +322,35 @@
                 var view_target = $(this).data('view-target');
                 world.set_view_for(view_target)
             });
+
+            $(document).on('click', 'start-construction-button', function (e) {
+                e.preventDefault();
+                var args = {};
+                var command = new Command('start_construction_project', args);
+                world.post_commands_to_server(command);
+            });
+
+            $(document).on('contextmenu', '#canvas', function (e) {
+                e.preventDefault();
+                var config = world.get_config();
+                console.log(Math.floor((config.container_pan_x + config.mouse_x) / config.scroll_factor - (config.canvas_size / 2)));
+                console.log(-Math.floor((config.container_pan_y + config.mouse_y) / config.scroll_factor - (config.canvas_size / 2)));
+            });
+
+            $(document).on('click', '.colony-selector', function (e) {
+                e.preventDefault();
+
+                var system_resource_table = $('#colony-resources-table');
+
+                var colony_id = this.data('colony-id');
+                var config = world.get_config();
+
+                var colony = config.empires['0'].colonies[colony_id];
+                system_resource_table.empty();
+                for (var resource in colony.resource_storage) {
+
+                }
+            })
         });
     </script>
 </body>

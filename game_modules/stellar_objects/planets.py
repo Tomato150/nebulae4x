@@ -1,14 +1,15 @@
 class TerrestrialBody:
-	def __init__(self, planet_id, name, star_id, orbit_index, **kwargs):
+	def __init__(self, planet_id, name, orbit_index, star_instance, **kwargs):
 		# Planet Location and General Information
 		self.name = name
 
 		# Planet parent body relevant information
-		self.parent_ids = {
+		self.ids = {
 			'self': planet_id,
 
-			'star': star_id
+			'star': star_instance.id
 		}
+
 		self.orbit_index = orbit_index  # 0, 1, 2 ... n
 		self.orbital_distance = 1.4  # Radius from the center.
 		self.eccentricity = 0
@@ -32,6 +33,8 @@ class TerrestrialBody:
 
 		# **kwarg update
 		self.__dict__.update(kwargs)
+
+		star_instance.planets[self.ids['self']] = self
 
 	# GETTERS
 	def get_colonies(self):

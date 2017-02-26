@@ -1,6 +1,7 @@
 from game_data.constants import general_constants
 
 import random
+import roman
 
 
 def name_creator(mini, maxi, syl):
@@ -13,3 +14,7 @@ def name_creator(mini, maxi, syl):
 			else:
 				name = name + random.choice(general_constants.CONSONANTS)
 	return name.capitalize()
+
+
+def toRoman(number):
+	return roman.toRoman(number)

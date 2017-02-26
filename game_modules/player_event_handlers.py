@@ -6,7 +6,7 @@ def start_construction_project(galaxy, colony_id, colony_parent_ids, project_det
 
 	construction_id = galaxy.get_id_counter('construction')
 	construction_project_instance = construction.ConstructionProject(construction_id, *project_details)
-	colony_instance.construction_projects[construction_project_instance.id] = construction_project_instance
+	colony_instance.construction_projects[construction_project_instance.ids['self']] = construction_project_instance
 
 	return {''}
 

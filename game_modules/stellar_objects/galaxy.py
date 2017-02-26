@@ -1,4 +1,7 @@
 from game_modules.stellar_objects import stars, planets
+from game_modules.faction_objects import empires, colonies, construction
+
+from game_modules import utility_functions
 
 import random
 import math
@@ -134,9 +137,9 @@ class Galaxy:
 				# Appending to right dictionary
 				if not star_collision:
 					if star_x == 0 and star_y == 0:
-						star_object = stars.Star(str(self.world_objects_id['stars']), star_x, star_y, name='Sol')
+						star_object = stars.Star(str(self.world_objects_id['stars']), star_x, star_y, self, name='Sol')
 					else:
-						star_object = stars.Star(str(self.world_objects_id['stars']), star_x, star_y)
+						star_object = stars.Star(str(self.world_objects_id['stars']), star_x, star_y, self)
 					self.star_quadrants[str(quadrant_x)][str(quadrant_y)][str(self.world_objects_id['stars'])] = star_object
 					self.world_objects['stars'][str(self.world_objects_id['stars'])] = star_object
 
@@ -149,37 +152,25 @@ class Galaxy:
 		print('Done: Galaxy Generation')
 		print('Count: ' + str(self.world_objects_id['stars']))
 
+	# All will map the instance to the desired object/dict.
+	def create_new_planet(self, star_instance, star_name, orbit_index):
+		planet_name = star_name + ' ' + utility_functions.toRoman(orbit_index + 1)
+		planet = planets.TerrestrialBody(self.world_objects_id['planets'], planet_name, orbit_index, star_instance)
+		self.world_objects_id['planets'] += 1
+		return planet
+
+	def create_new_empire(self, name):
+		empire = empires.Empire(self.world_objects_id['empires'], name, self)
+		self.world_objects_id['empires'] += 1
+		self.world_objects['empires'][empire.id] = empire
+		return empire
+
+	def create_new_colony(self, name, planet_instance, empire_instance):
+		colony = colonies.Colony(self.world_objects_id['colonies'], name, planet_instance, empire_instance)
+		self.world_objects_id['colonies'] += 1
+		return colony
+
 	# GETTERS
-	def get_objects(self, objects='all'):
-		# Objects = 'object' OR ['object', 'object', ...]
-		if type(objects) == str:
-			if objects.lower() == 'all':
-				return self.world_objects
-			else:
-				return self.world_objects[objects]
-		else:
-			return_dict = {}
-			for object_wanted in objects:
-				return_dict[object_wanted] = self.world_objects[object_wanted]
-			return return_dict
-
-	def get_id_counter(self, objects='all'):
-		# Objects = 'object' OR ['object', 'object', ...]
-		if type(objects) == str:
-			if objects.lower() == 'all':
-				for object_type in self.world_objects_id:
-					self.world_objects_id[object_type] += 1
-				return self.world_objects_id
-			else:
-				self.world_objects_id[objects] += 1
-				return self.world_objects_id[objects]
-		else:
-			return_dict = {}
-			for object_wanted in objects:
-				self.world_objects_id[objects] += 1
-				return_dict[object_wanted] = self.world_objects_id[object_wanted]
-			return return_dict
-
 	def get_galaxy_creation_parameters(self, objects='all'):
 		if type(objects) == str:
 			if objects.lower() == 'all':

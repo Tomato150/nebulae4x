@@ -76,7 +76,8 @@ var handler_object = (function () {
                 var star = config.stars[star_inx];
                 if (star.coordinates[0] == x_coord && star.coordinates[1] ==  y_coord) {
                     config.selected_star = star;
-                    config.currently_viewing = 'local_system_canvas'
+                    config.currently_viewing = 'local_system_canvas';
+                    world.update_local_system();
                 }
             }
         }

@@ -1,5 +1,5 @@
 class Empire:
-	def __init__(self, name, empire_id, **kwargs):
+	def __init__(self, empire_id, name, galaxy, **kwargs):
 		# Empire name and identification
 		self.id = empire_id
 		self.name = name
@@ -16,6 +16,8 @@ class Empire:
 		self.fleets = {}  # See above for fleets.
 
 		self.__dict__.update(kwargs)
+
+		galaxy.world_objects['empires'][self.id] = self
 
 	# GETTERS
 	def get_player_empire(self):

@@ -155,11 +155,15 @@ var world_object = (function () {
     }
 
     function _set_main_to_empire() {
-        _set_header('Empire Overview')
+        _set_header('Empire Overview');
+        $('#main-menu-empire-screen').removeAttr('hidden');
+        $('#main-menu-system-screen').attr({'hidden': ''});
     }
 
     function _set_main_to_system() {
-        _set_header('System View')
+        _set_header('System View');
+        $('#main-menu-system-screen').removeAttr('hidden');
+        $('#main-menu-empire-screen').attr({'hidden': ''});
     }
 
     function _set_menu_for(data_window_target) {
@@ -175,10 +179,13 @@ var world_object = (function () {
         return config;
     }
 
-    function _post_commands_to_server() {
+    function _post_commands_to_server(command) {
         $.ajax({
             type: 'POST',
             url: '/commands_to_server',
+            data: JSON.stringify({
+                command: command
+            }),
             dataType: 'json',
             contentType: 'application/json',
             success: function (server_data) {
@@ -193,11 +200,27 @@ var world_object = (function () {
             error: function (xhr, ajaxOptions, thrownError) {alert('Error: Unable to load page: ' + thrownError);}
         });
     }
+    
+    function _update_local_system() {
+        _set_main_to_system();
+        var colony_table = $('#system-colony-table');
+        colony_table.empty();
+        for (var planet_id in config.selected_star.planets) {
+            var planet = config.selected_star.planets[planet_id];
+            console.log(planet);
+            for (var colony_id in planet.colonies) {
+                var colony = planet.colonies[colony_id];
+                colony_table.append('<tr><td class="colony-selector" data-colony-id=' + colony.ids['self'] + '>' + colony.name + '</td></tr>');
+            }
+        }
+    }
 
     return {
         init: _init,
         set_menu_for: _set_menu_for,
         set_view_for: _set_view_for,
-        get_config: _get_config
+        post_commands_to_server: _post_commands_to_server,
+        get_config: _get_config,
+        update_local_system: _update_local_system
     }
 })();

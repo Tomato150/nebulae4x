@@ -14,8 +14,11 @@ class PlayerWorld:
 			'remove_construction_project': player_event_handlers.remove_construction_project
 		}
 
-	def generate_player_empire(self):
-		pass
+	def generate_mock_game(self):
+		empire = self.galaxy.create_new_empire('Player Faction')
+		planet_id = self.galaxy.world_objects_id['planets']
+		self.galaxy.world_objects['stars']['0'].generate_planets(self.galaxy)
+		self.galaxy.create_new_colony('Earth', self.galaxy.world_objects['stars']['0'].planets[planet_id], empire)
 
 	def handle_player_input(self, commands):
 		refresh_list = []
@@ -29,13 +32,14 @@ class PlayerWorld:
 
 	# GETTERS
 	def get_all_objects(self):
-		return self.galaxy.get_objects()
+		return self.galaxy.world_objects
 
 	def get_canvas_size(self):
 		return self.galaxy.get_galaxy_creation_parameters('size_of_canvas')
 
-	def game_loop(self):
+	def run_game_loop(self):
 		pass
 
 
 player_world = PlayerWorld()
+player_world.generate_mock_game()

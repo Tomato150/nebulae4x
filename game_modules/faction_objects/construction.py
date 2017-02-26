@@ -1,20 +1,18 @@
 class ConstructionProject:
-	def __init__(self, project_id, project_name, parent_colony_instance, project_info, project_cost, project_runs, num_of_factories):
-		# General information
-		self.name = project_name  # Name of the project/What you are building
-
+	def __init__(self, project_id, project_info, project_cost, project_runs, num_of_factories, colony_instance,
+				 **kwargs):
 		# Parent Id's
 		self.ids = {
 			'self': project_id,
-			'star': parent_colony_instance.parent_ids['star'],
-			'planet': parent_colony_instance.parent_ids['planet'],
+			'star': colony_instance.parent_ids['star'],
+			'planet': colony_instance.parent_ids['planet'],
 
-			'empire': parent_colony_instance.parent_ids['empire'],
-			'colony': parent_colony_instance.id
+			'empire': colony_instance.parent_ids['empire'],
+			'colony': colony_instance.id
 		}
 
 		# Project Info
-		self.project_info = [project_info[0], project_info[1]]   # [What you are building, installation/building]
+		self.project_info = [project_info[0], project_info[1]]  # [What you are building, installation/building]
 		self.project_cost = project_cost  # Individual resource cost per resource
 
 		currently_completed = {}
@@ -25,6 +23,10 @@ class ConstructionProject:
 		self.project_runs = project_runs  # How many copies are to be made.
 
 		self.num_of_factories = num_of_factories
+
+		self.__dict__.update(kwargs)
+
+		colony_instance.construction_projects[self.ids['self']] = self
 
 	def _assign_build_points(self, CP_allocated, CP_to_finish, material, colony_resource):
 		remainder_CP = 0
@@ -69,9 +71,9 @@ class ConstructionProject:
 
 	def construction_tick(self, galaxy):
 		# Apply what you can, get remainders
-
 		empire_instance = galaxy.world_objects[self.parent_ids['empire']]
 		colony_instance = empire_instance[self.parent_ids['colony']]
+
 		while True:
 			# Get build points for the total phase of construction
 			total_CP = self.num_of_factories * empire_instance.modifiers['building_modifiers']['build_points'] / 365
@@ -85,7 +87,7 @@ class ConstructionProject:
 					CP_to_finish = self.project_cost[material] - self.currently_completed[material]
 					total_CP -= CP_allocated
 					# Assign build points, get remainders and add back to pool.
-					remainder_CP, available_for_extra = self._assign_build_points(CP_allocated, CP_to_finish, material, colony_instance.resource_storage[material]['current'])
+					remainder_CP, available_for_extra = self._assign_build_points(CP_allocated, CP_to_finish, material, colony_instance.resource_storage[material])
 					total_CP += remainder_CP
 					# Add to extra if available.
 					if available_for_extra:
