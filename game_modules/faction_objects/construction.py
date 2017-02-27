@@ -71,8 +71,8 @@ class ConstructionProject:
 
 	def construction_tick(self, galaxy):
 		# Apply what you can, get remainders
-		empire_instance = galaxy.world_objects[self.parent_ids['empire']]
-		colony_instance = empire_instance[self.parent_ids['colony']]
+		empire_instance = galaxy.world_objects[self.ids['empire']]
+		colony_instance = empire_instance[self.ids['colony']]
 
 		while True:
 			# Get build points for the total phase of construction

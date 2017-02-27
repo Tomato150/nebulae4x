@@ -152,39 +152,59 @@
                             <div id="system-economy" class="tab-pane" role="tabpanel">
                                 <h1>System Economy Tabpanel</h1>
                                 <p>Useless information should go about ... Here</p>
-                                <row>
-                                    <div class="col-xl-6">
-                                        <table class="table table-hover table-striped table-sm">
-                                            <thead>
-                                            <tr>
-                                                <th>Resource</th>
-                                                <th>Amount</th>
-                                                <th>Max</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody id="colony-resources-table">
-                                            <tr>
-                                                <td>Water</td>
-                                                <td>100</td>
-                                                <td>1000</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Building Materials</td>
-                                                <td>100</td>
-                                                <td>1000</td>
-                                            </tr>
-                                            </tbody>
-                                            <tbody>
-
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </row>
                             </div>
 
                             <div id="system-industry" class="tab-pane" role="tabpanel">
                                 <h1>System Industry Tabpanel</h1>
                                 <p>Useless information should go about ... Here</p>
+                                <div class="row">
+                                    <div id="construction-project-table" class="col-xl-12">
+
+                                    </div>
+
+                                    <div id="create-new-project-menu" class="col-xl-12">
+                                        <div class="row">
+                                            <div id="buildings-list" class="col-xl-2">
+                                                <table class="table table-sm table-striped">
+                                                    <tbody>
+                                                        <tr><td class="selectable-building">Factory</td></tr>
+                                                        <tr><td class="selectable-building" >Mine</td></tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+                                            <div id="construction-project-settings" class="col-xl-6">
+                                                <form>
+                                                    <fieldset disabled>
+                                                        <div class="form-group row" style="margin-bottom: 4px;">
+                                                            <label class="col-2 col-form-label col-form-label-sm" for="construction-project-building">Building</label>
+                                                            <div class="col-10">
+                                                                <input id="construction-project-building" class="form-control form-control-sm" type="text">
+                                                            </div>
+                                                        </div>
+                                                    </fieldset>
+                                                    <div class="form-group row" style="margin-bottom: 4px;">
+                                                        <label class="col-2 col-form-label col-form-label-sm" for="construction-project-runs">Runs</label>
+                                                        <div class="col-10">
+                                                            <input id="construction-project-runs" class="form-control form-control-sm" type="text">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <label class="col-2 col-form-label col-form-label-sm" for="construction-project-factories">Factories</label>
+                                                        <div class="col-10">
+                                                            <input id="construction-project-factories" class="form-control form-control-sm" type="text">
+                                                        </div>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                                </form>
+                                            </div>
+
+                                            <div id="construction-project-stats" class="col-xl-4">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <div id="system-fleets" class="tab-pane" role="tabpanel">
@@ -243,26 +263,8 @@
     <script src="/static/js/handlers.js"></script>
 
     {% raw %}
-    <script id="planet-card-template" type="text/x-jsrender">
-        <div class="list-group list-group-flush">
-            <div id="{{:name}}-heading" class="card-header planet-card-header" role="tab">
-                <h5 class="mb-0">
-                    <a class="planet-card-header-link" data-planet-id={{:planet_id}} data-toggle="collapse" data-parent="overview-tab-colonies" href="#{{:name}}-body">Earth</a>
-                </h5>
-            </div>
+    <script id="construction-project-table-template" type="text/x-jsrender">
 
-            <div id="{{:name}}-body" class="collapse" role="tabpanel" aria-labelledby="{{:name}}-heading">
-                <div class="card-block" style="border-bottom: 1px solid rgba(0,0,0,.125);">
-                    <p>{{:name}} Filler Text.</p>
-                </div>
-            </div>
-        </div>
-    </script>
-
-    <script id="planet-colony-template" type="text/x-jsrender">
-        <div id="colony-{{:colony_id}}">
-
-                    </div>
     </script>
     {% endraw %}
 
@@ -350,6 +352,11 @@
                 for (var resource in colony.resource_storage) {
 
                 }
+            });
+
+            $(document).on('click', '.selectable-building', function (e) {
+                e.preventDefault();
+                $('#construction-project-building').val(($(this).text()));
             })
         });
     </script>
