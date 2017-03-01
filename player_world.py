@@ -20,10 +20,9 @@ class PlayerWorld:
 		self.galaxy.world_objects['stars']['0'].generate_planets(self.galaxy)
 		self.galaxy.create_new_colony('Earth', self.galaxy.world_objects['stars']['0'].planets[planet_id], empire)
 
-	def handle_player_input(self, commands):
+	def handle_player_input(self, command):
 		refresh_list = []
-		for command in commands:
-			refresh_list.append(self.player_command_mapping[command.name](self.galaxy, *command.args))
+		refresh_list.append(self.player_command_mapping[command.name](self.galaxy, *command.args))
 
 		return refresh_list
 

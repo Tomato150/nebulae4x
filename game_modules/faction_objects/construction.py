@@ -1,6 +1,5 @@
 class ConstructionProject:
-	def __init__(self, project_id, project_info, project_cost, project_runs, num_of_factories, colony_instance,
-				 **kwargs):
+	def __init__(self, project_id, project_info, project_runs, num_of_factories, project_cost, colony_instance, **kwargs):
 		# Parent Id's
 		self.ids = {
 			'self': project_id,
@@ -12,7 +11,7 @@ class ConstructionProject:
 		}
 
 		# Project Info
-		self.project_info = [project_info[0], project_info[1]]  # [What you are building, installation/building]
+		self.project_info = project_info  # What you are building
 		self.project_cost = project_cost  # Individual resource cost per resource
 
 		currently_completed = {}
@@ -64,7 +63,7 @@ class ConstructionProject:
 			for key in self.currently_completed:
 				self.currently_completed[key] = 0
 			self.project_runs -= 1
-			colony.add_buildings(self.project_info[0], galaxy)
+			colony.add_buildings(self.project_info, galaxy)
 			return True
 		else:
 			return False

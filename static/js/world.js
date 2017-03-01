@@ -18,6 +18,8 @@ var world_object = (function () {
         'player_empire': null,
         'selected_star': null,
         'selected_planet': null,
+        'selected_colony': null,
+
         'canvas_size': 6000,
         'scroll_factor': 1,
 
@@ -70,7 +72,22 @@ var world_object = (function () {
     }
 
     function _init(server_data) {
-        $.extend(config, server_data);
+        config.empires = server_data['empires'];
+        config.stars = server_data['stars'];
+
+        // OPTIMIZE Make so that the data not needed doesn't come in from server.
+        for (var empire_id in config.empires) {
+            for (var colony_id in config.empires[empire_id].colonies) {
+                for (var star_id in config.stars) {
+                    for (var planet_id in config.stars[star_id].planets) {
+                        var planet = config.stars[star_id].planets[planet_id];
+                        if (colony_id in planet.colonies) {
+                            planet.colonies[colony_id] = config.empires[empire_id].colonies[colony_id];
+                        }
+                    }
+                }
+            }
+        }
 
         _size_windows();
 

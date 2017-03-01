@@ -170,6 +170,11 @@ class Galaxy:
 		self.world_objects_id['colonies'] += 1
 		return colony
 
+	def create_new_construction_project(self, project_details, project_cost, colony_instance):
+		construction_project = construction.ConstructionProject(self.world_objects_id['construction_projects'], *project_details, project_cost, colony_instance)
+		self.world_objects_id['construction_projects'] += 1
+		return construction_project
+
 	# GETTERS
 	def get_galaxy_creation_parameters(self, objects='all'):
 		if type(objects) == str:

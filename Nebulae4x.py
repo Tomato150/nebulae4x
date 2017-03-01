@@ -83,11 +83,9 @@ def get_stars():
 @app.route('/commands_to_server', methods=['POST'])
 def commands_to_server():
 	client_data = request.get_json()
-	events = []
-	for event in client_data:
-		events.append(PlayerEvent(event['name'], event['args']))
+	event = client_data['command']
 
-	refresh_list = player_world.handle_player_input(events)
+	refresh_list = player_world.handle_player_input(PlayerEvent(event['name'], event['args']))
 
 	return json.dumps(refresh_list)
 
