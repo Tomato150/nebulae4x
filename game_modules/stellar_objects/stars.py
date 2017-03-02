@@ -41,3 +41,8 @@ class Star:
 	# SETTERS:
 	def add_planet(self, planet_id):
 		self.planets.append(planet_id)
+
+	def serialize(self):
+		dictionary = dict(self.__dict__)
+		dictionary.pop('planets')
+		return dictionary

@@ -52,6 +52,12 @@ class Colony:
 			galaxy.add_objects({'installations': building})
 			self.installations[building.name] = building.id
 
+	def serialize(self):
+		dictionary = dict(self.__dict__)
+		dictionary.pop('construction_projects')
+		dictionary.pop('installations')
+		return dictionary
+
 
 class Installation:
 	def __init__(self, name, installation_id):

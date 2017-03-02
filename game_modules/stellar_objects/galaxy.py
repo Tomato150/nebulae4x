@@ -175,6 +175,50 @@ class Galaxy:
 		self.world_objects_id['construction_projects'] += 1
 		return construction_project
 
+	def get_object_by_id(self, object_type, object_ids, is_self=False):
+		if is_self:
+			if object_type == 'star':
+				return self.world_objects['stars'][object_ids['self']]
+			elif object_type == 'planet':
+				return self.world_objects['stars'][object_ids['star']].planets[object_ids['self']]
+			elif object_type == 'empire':
+				return self.world_objects['empires'][object_ids['self']]
+			elif object_type == 'colony':
+				return self.world_objects['empires'][object_ids['empire']].colonies[object_ids['self']]
+			elif object_type == 'construction_project':
+				return self.world_objects['empires'][object_ids['empire']].colonies[object_ids['self']].construction_projects[object_ids['self']]
+		else:
+			if object_type == 'star':
+				return self.world_objects['stars'][object_ids['star']]
+			elif object_type == 'planet':
+				return self.world_objects['stars'][object_ids['star']].planets[object_ids['planet']]
+			elif object_type == 'empire':
+				return self.world_objects['empires'][object_ids['empire']]
+			elif object_type == 'colony':
+				return self.world_objects['empires'][object_ids['empire']].colonies[object_ids['colony']]
+
+	def get_objects_by_category(self, object_type):
+		objects = {}
+		if object_type in ['stars', 'planets']:
+			for star_id, star_instance in self.world_objects['stars']:
+				if object_type == 'planets':
+					for planet_id, planet_instance in star_instance.planets.items():
+						objects[planet_id] = planet_instance
+				elif object_type == 'stars':
+					objects[star_id] = star_instance
+
+		elif object_type in ['empires', 'colonies', 'construction_projects']:
+			for empire_id, empire_instance in self.world_objects['empires']:
+				if object_type in ['colonies', 'construction_projects']:
+					for colony_id, colony_instance in empire_instance.colonies.items():
+						if object_type == 'construction_projects':
+							for construction_project_id, construction_project_instance in colony_instance.items():
+								objects[construction_project_id] = construction_project_instance
+						elif object_type == 'colonies':
+							objects[colony_id] = colony_instance
+				elif object_type == 'empires':
+					objects[empire_id] = empire_instance
+
 	# GETTERS
 	def get_galaxy_creation_parameters(self, objects='all'):
 		if type(objects) == str:
@@ -187,6 +231,3 @@ class Galaxy:
 			for object_wanted in objects:
 				return_dict[object_wanted] = self.galaxy_creation_parameters[object_wanted]
 			return return_dict
-
-	def get_object_by_id_chain(self, id_chain, object_type):
-		pass

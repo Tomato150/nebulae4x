@@ -115,3 +115,6 @@ class ConstructionProject:
 
 	def remove_construction(self, galaxy, colony_ids):
 		pass
+
+	def serialize(self):
+		return dict(self.__dict__)

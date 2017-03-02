@@ -38,3 +38,9 @@ class Empire:
 
 	def add_colony(self, colony_id):
 		self.colonies.append(colony_id)
+
+	def serialize(self):
+		dictionary = dict(self.__dict__)
+		dictionary.pop('colonies')
+		dictionary.pop('fleets')
+		return dictionary

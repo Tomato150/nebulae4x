@@ -72,9 +72,15 @@ def index():
 	return render_template('index.html')
 
 
-@app.route('/get_stars', methods=['GET'])
+@app.route('/get_objects', methods=['GET'])
 def get_stars():
-	return_vals = player_world.get_all_objects()
+	return_vals = {
+		'stars': player_world.galaxy.world_objects['stars'],
+		'planets': player_world.galaxy.get_objects_by_category('planets'),
+		'empires': player_world.galaxy.world_objects['empires'],
+		'colonies': player_world.galaxy.get_objects_by_category('colonies'),
+		'construction_projects': player_world.galaxy.get_objects_by_category('construction_projects')
+	}
 	return_vals.update({'canvas_size': player_world.get_canvas_size()})
 
 	return json.dumps(return_vals, default=to_json)
@@ -85,9 +91,9 @@ def commands_to_server():
 	client_data = request.get_json()
 	event = client_data['command']
 
-	refresh_list = player_world.handle_player_input(PlayerEvent(event['name'], event['args']))
+	refresh_dict = player_world.handle_player_input(PlayerEvent(event['name'], event['args']))
 
-	return json.dumps(refresh_list)
+	return json.dumps(refresh_dict)
 
 if __name__ == '__main__':
 	app.run(host='0.0.0.0')

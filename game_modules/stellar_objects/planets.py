@@ -36,6 +36,11 @@ class TerrestrialBody:
 
 		star_instance.planets[self.ids['self']] = self
 
+	def serialize(self):
+		dictionary = dict(self.__dict__)
+		dictionary.pop('colonies')
+		return dictionary
+
 	# GETTERS
 	def get_colonies(self):
 		return self.colonies

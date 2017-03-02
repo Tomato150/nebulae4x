@@ -62,6 +62,34 @@ var world_object = (function () {
         'local_system_other_container': null  // Contains information about fleets and other occurrences
     };
 
+    function _get_object_by_ids(object_type, object_ids, is_self) {
+        if (is_self) {
+            if (object_type == 'star') {
+                return config.stars[object_ids['self']]
+            } else if (object_type == 'planet') {
+                return config.stars[object_ids['star']].planets[object_ids['self']]
+            } else if (object_type == 'empire') {
+                return config.empires[object_ids['self']]
+            } else if (object_type == 'colony') {
+                return config.empires[object_ids['empire']].colonies[object_ids['self']]
+            } else if (object_type == 'construction_projects') {
+                return config.empires[object_ids['empire']].colonies[object_ids['colony']].construction_projects[object_ids['self']]
+            }
+        } else if (is_self == false) {
+            if (object_type == 'star') {
+                return config.stars[object_ids['star']]
+            } else if (object_type == 'planet') {
+                return config.stars[object_ids['star']].planets[object_ids['planet']]
+            } else if (object_type == 'empire') {
+                return config.empires[object_ids['empire']]
+            } else if (object_type == 'colony') {
+                return config.empires[object_ids['empire']].colonies[object_ids['colony']]
+            } else if (object_type == 'construction_projects') {
+                return config.empires[object_ids['empire']].colonies[object_ids['colony']].construction_projects[object_ids['construction_project']]
+            }
+        }
+    }
+
     function _size_windows() {
         config.main_menu_div.height($(window).height() - 58 - 40).width(($(window).width() - 40)).css({'left': '20px', 'top': '78px'});
         var attribute_list = {
@@ -76,17 +104,14 @@ var world_object = (function () {
         config.stars = server_data['stars'];
 
         // OPTIMIZE Make so that the data not needed doesn't come in from server.
-        for (var empire_id in config.empires) {
-            for (var colony_id in config.empires[empire_id].colonies) {
-                for (var star_id in config.stars) {
-                    for (var planet_id in config.stars[star_id].planets) {
-                        var planet = config.stars[star_id].planets[planet_id];
-                        if (colony_id in planet.colonies) {
-                            planet.colonies[colony_id] = config.empires[empire_id].colonies[colony_id];
-                        }
-                    }
-                }
-            }
+        for (var planet_id in server_data['planets']) {
+            var planet_instance = server_data[planet_id];
+            config.stars[planet_instance.ids['star']].planets[planet_instance.ids['self']] = planet_instance;
+        }
+
+        for (var colony_id in server_data['colonies']) {
+            var colony_instance = server_data[colony_id];
+            config.stars
         }
 
         _size_windows();

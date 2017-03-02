@@ -21,15 +21,12 @@ class PlayerWorld:
 		self.galaxy.create_new_colony('Earth', self.galaxy.world_objects['stars']['0'].planets[planet_id], empire)
 
 	def handle_player_input(self, command):
-		refresh_list = []
-		refresh_list.append(self.player_command_mapping[command.name](self.galaxy, *command.args))
-
-		return refresh_list
+		return self.player_command_mapping[command.name](self.galaxy, *command.args)
 
 	def game_loop(self):
 		game_loop.game_loop(self.galaxy)
 
-	# GETTERS
+	# GETTERS5
 	def get_all_objects(self):
 		return self.galaxy.world_objects
 
