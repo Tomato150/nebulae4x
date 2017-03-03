@@ -38,7 +38,7 @@ class TerrestrialBody:
 
 	def serialize(self):
 		dictionary = dict(self.__dict__)
-		dictionary.pop('colonies')
+		dictionary['colonies'] = {}
 		return dictionary
 
 	# GETTERS

@@ -29,7 +29,8 @@ var world_object = (function () {
         // Main menu window related to system information
         'set_menu_for': {
             'empire-menu': _set_main_to_empire,
-            'system-menu': _set_main_to_system
+            'system-menu': _set_main_to_system,
+            'colony-menu': _set_main_to_colony
         },
 
         'main_menu_header_title': $('#main-menu-header-title'),
@@ -104,21 +105,21 @@ var world_object = (function () {
         config.stars = server_data['stars'];
 
         for (var planet_id in server_data['planets']) {
-            var planet_instance = server_data[planet_id],
-                planet_ids = planet_instance.ids;
+            var planet_instance = server_data['planets'][planet_id];
+            var planet_ids = planet_instance.ids;
             config.stars[planet_ids['star']].planets[planet_ids['self']] = planet_instance;
         }
 
         for (var colony_id in server_data['colonies']) {
-            var colony_instance = server_data[colony_id],
-                colony_ids = colony_instance.ids;
+            var colony_instance = server_data['colonies'][colony_id];
+            var colony_ids = colony_instance.ids;
             config.stars[colony_ids['star']].planets[colony_ids['planet']].colonies[colony_ids['self']] = colony_instance;
             config.empires[colony_ids['empire']].colonies[colony_ids['self']] = colony_instance;
         }
 
         for (var construction_project_id in server_data['construction_projects']) {
-            var construction_project_instance = server_data[construction_project_id],
-                construction_project_ids = colony_instance.ids;
+            var construction_project_instance = server_data['construction_projects'][construction_project_id];
+            var construction_project_ids = colony_instance.ids;
             config.empires[construction_project_ids['empire']].colonies[construction_project_ids['colony']]
                 .construction_projects[construction_project_id['self']] = construction_project_instance;
         }
@@ -201,24 +202,24 @@ var world_object = (function () {
         config.renderer.render(config.stage);
     }
 
-    function _set_header(header_text) {
-        config.main_menu_header_title.text(header_text)
-    }
-
     function _set_main_to_empire() {
-        _set_header('Empire Overview');
+        config.main_menu_header_title.text('Empire Overview');
         $('#main-menu-empire-screen').removeAttr('hidden');
         $('#main-menu-system-screen').attr({'hidden': ''});
     }
 
     function _set_main_to_system() {
-        _set_header('System View');
+        config.main_menu_header_title.text('System View');
         $('#main-menu-system-screen').removeAttr('hidden');
         $('#main-menu-empire-screen').attr({'hidden': ''});
     }
 
-    function _set_menu_for(data_window_target) {
-        config.set_menu_for[data_window_target]();
+    function _set_main_to_colony() {
+        config.main_menu_header_title.text('Colony View');
+    }
+
+    function _set_menu_for(target) {
+        config.set_menu_for[target]();
         config.main_menu_div.removeAttr('hidden')
     }
 

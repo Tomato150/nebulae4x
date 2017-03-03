@@ -41,6 +41,6 @@ class Empire:
 
 	def serialize(self):
 		dictionary = dict(self.__dict__)
-		dictionary.pop('colonies')
-		dictionary.pop('fleets')
+		dictionary['colonies'] = {}
+		dictionary['fleets'] = {}
 		return dictionary

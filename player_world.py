@@ -16,9 +16,11 @@ class PlayerWorld:
 
 	def generate_mock_game(self):
 		empire = self.galaxy.create_new_empire('Player Faction')
-		planet_id = self.galaxy.world_objects_id['planets']
+		planet_id = str(self.galaxy.world_objects_id['planets'])
 		self.galaxy.world_objects['stars']['0'].generate_planets(self.galaxy)
 		self.galaxy.create_new_colony('Earth', self.galaxy.world_objects['stars']['0'].planets[planet_id], empire)
+
+		print(self.galaxy.world_objects['stars']['0'].planets)
 
 	def handle_player_input(self, command):
 		return self.player_command_mapping[command.name](self.galaxy, *command.args)

@@ -19,12 +19,12 @@
         <a class="navbar-brand" href="#" id="main-menu-div-toggle">Menu</a>
         <div id="navbar_content" class="collapse navbar-collapse" style="display: block">
             <ul class="navbar-nav mr-auto" style="">
-                <li class="nav-item"><a class="nav-link navbar-menu-popover" data-window-target="empire-menu" href="#">Empire Overview</a></li>
-                <li class="nav-item"><a class="nav-link navbar-menu-popover" data-window-target="system-menu" href="#">System Overview</a></li>
+                <li class="nav-item"><a class="nav-link navbar-main-menu-selectors" data-window-target="empire-menu" href="#">Empire Overview</a></li>
+                <li class="nav-item"><a class="nav-link navbar-main-menu-selectors" data-window-target="system-menu" href="#">System Overview</a></li>
             </ul>
             <ul class="float-right navbar-nav mr-auto" style="margin: 0 !important;">
-                <li class="nav-item"><a class="nav-link navbar-view-toggle" data-view-target="galaxy_canvas" href="#">Galaxy Viewer</a></li>
-                <li class="nav-item"><a class="nav-link navbar-view-toggle" data-view-target="local_system_canvas" href="#">Local System Viewer</a></li>
+                <li class="nav-item"><a class="nav-link navbar-canvas-view-toggle" data-view-target="galaxy_canvas" href="#">Galaxy Viewer</a></li>
+                <li class="nav-item"><a class="nav-link navbar-canvas-view-toggle" data-view-target="local_system_canvas" href="#">Local System Viewer</a></li>
             </ul>
         </div>
     </nav>
@@ -40,7 +40,7 @@
                 </div>
             </div>
 
-            <div id="main-menu-empire-screen" hidden>
+            <div id="main-menu-empire-screen">
                 <div class="row">
                     <div id="empire-pill-navs" class="col-xl-12">
                         <ul class="nav nav-pills justify-content-center">
@@ -109,9 +109,12 @@
                 </div>
             </div>
 
-            <div id="main-menu-system-screen">
-                <div class="row">
-                    <div id="system-pill-navs" class="col-xl-12">
+            <div id="main-menu-system-screen" hidden>
+                <div id="please-select">
+                    <p>Please select a colony from the side</p>
+                </div>
+                <div id="main-menu-body" class="row">
+                    <div id="system-pill-navs" class="col-xl-12" hidden>
                         <ul class="nav nav-pills justify-content-center">
                             <!-- <li class="nav-item"><a href="#" class="nav-link" data-toggle="tab" role="tab"></a></li> -->
                             <li class="nav-item"><a href="#system-overview" class="nav-link active" data-toggle="tab" role="tab">Overview</a></li>
@@ -137,7 +140,7 @@
                         </div>
                     </div>
 
-                    <div id="system-pill-contents" class="col-xl-10">
+                    <div id="system-pill-contents" class="col-xl-10" hidden>
                         <div class="tab-content">
                             <!-- <div id="" class="tab-pane" role="tabpanel"></div> -->
                             <div id="system-overview" class="tab-pane active" role="tabpanel">
@@ -263,6 +266,9 @@
     <script src="/static/js/jsrender.min.js"></script>
 
     <script src="/static/js/world.js"></script>
+
+    <script src="/static/js/handlers/mouse.js"></script>
+
     <script src="/static/js/handlers.js"></script>
 
     {% raw %}
@@ -274,6 +280,9 @@
     <script>
         $(document).ready(function () {
             var world = world_object;
+
+            var mouse_handlers = handler_object;
+
             var handlers = handler_object;
 
             function Command(name, args) {
@@ -289,19 +298,26 @@
                 success: function (server_data) {
                     world.init(server_data);
                 },
-                error: function (xhr, ajaxOptions, thrownError) {alert('Error: Unable to load page: ' + thrownError);}
+                error: function (xhr, ajaxOptions, thrownError) {alert('Error: Unable to load objects from server: ' + thrownError);}
             });
 
-            $(document).on('mousewheel', function (e) {handlers.mouse_scroll(e, world);});
+            // Mouse Scroll on canvas.
+            $(document).on('mousewheel', '#canvas', function (e) {mouse_handlers.mouse_scroll(e, world);});
 
-            $(document).on('mousedown', '#canvas', function (e) {handlers.canvas_mouse_click(e, world);});
+            // Dragging Canvas
+            $(document).on('mousedown', '#canvas', function (e) {mouse_handlers.canvas_mouse_click(e, world);});
 
-            $(document).on('dblclick', '#canvas', function (e) {handlers.galaxy_double_click(e, world);});
+            // Double click to select planet.
+            $(document).on('dblclick', '#canvas', function (e) {mouse_handlers.galaxy_double_click(e, world);});
 
-            $(document).on('mousemove', function (e) {handlers.mouse_move(e, world);} );
+            // Mouse move on canvas.
+            $(document).on('mousemove', function (e) {mouse_handlers.mouse_move(e, world);} );
 
-            $(document).on('mouseup', function (e) {handlers.mouse_click_up(e, world);} );
+            // Releasing mouse button
+            $(document).on('mouseup', function (e) {mouse_handlers.mouse_click_up(e, world);} );
 
+            // TODO Move all to separate files.
+            // Main menu header button
             $(document).on('click', '#main-menu-div-toggle', function (e) {
                 e.preventDefault();
                 var main_menu = $('#main-menu-div');
@@ -312,22 +328,26 @@
                 }
             });
 
+            // Cross button for main menu
             $(document).on('click', '#main-menu-close', function () {
                 $('#main-menu-div').attr({'hidden': ''})
             });
-            
-            $(document).on('click', '.navbar-menu-popover', function (e) {
+
+            // Set which view is visible
+            $(document).on('click', '.navbar-main-menu-selectors', function (e) {
                 e.preventDefault();
                 var data_window_target = $(this).data('window-target');
                 world.set_menu_for(data_window_target)
             });
 
-            $(document).on('click', '.navbar-view-toggle', function (e) {
+            // Change galactic view
+            $(document).on('click', '.navbar-canvas-view-toggle', function (e) {
                 e.preventDefault();
                 var view_target = $(this).data('view-target');
                 world.set_view_for(view_target)
             });
 
+            // Create construction project
             $(document).on('click', '#construction-project-creation', function (e) {
                 e.preventDefault();
                 var config = world.get_config();
@@ -343,6 +363,7 @@
                 world.post_commands_to_server(command);
             });
 
+            // Right click
             $(document).on('contextmenu', '#canvas', function (e) {
                 e.preventDefault();
                 var config = world.get_config();
@@ -350,6 +371,7 @@
                 console.log(-Math.floor((config.container_pan_y + config.mouse_y) / config.scroll_factor - (config.canvas_size / 2)));
             });
 
+            // Select a colony from sidebar
             $(document).on('click', '.colony-selector', function (e) {
                 e.preventDefault();
 
@@ -360,12 +382,11 @@
 
                 var colony = config.empires['0'].colonies[colony_id];
                 config.selected_colony = colony;
-                system_resource_table.empty();
-                for (var resource in colony.resource_storage) {
-                    console.log('.')
-                }
+
+                world.set_menu_for('colony')
             });
 
+            // Select building from sidebar.
             $(document).on('click', '.selectable-building', function (e) {
                 e.preventDefault();
                 $('#construction-project-building').val(($(this).text()));

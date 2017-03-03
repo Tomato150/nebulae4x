@@ -54,8 +54,8 @@ class Colony:
 
 	def serialize(self):
 		dictionary = dict(self.__dict__)
-		dictionary.pop('construction_projects')
-		dictionary.pop('installations')
+		dictionary['construction_projects'] = {}
+		dictionary['installations'] = {}
 		return dictionary
 
 

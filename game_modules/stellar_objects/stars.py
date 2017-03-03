@@ -29,7 +29,7 @@ class Star:
 
 	def generate_planets(self, galaxy, amount='random'):
 		if amount == 'random':
-			amount = random.randint(0, 8)
+			amount = random.randint(3, 8)
 		for i in range(0, amount):
 			galaxy.create_new_planet(self, self.name, len(self.planets))
 
@@ -44,5 +44,5 @@ class Star:
 
 	def serialize(self):
 		dictionary = dict(self.__dict__)
-		dictionary.pop('planets')
+		dictionary['planets'] = {}
 		return dictionary
