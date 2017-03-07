@@ -3,6 +3,8 @@ from game_modules import player_event_handlers, game_loop
 
 from game_modules.stellar_objects import galaxy
 
+from game_data.constants import construction_constants
+
 
 class PlayerWorld:
 	def __init__(self):
@@ -11,7 +13,6 @@ class PlayerWorld:
 		self.galaxy.generate_galaxy()
 		self.player_command_mapping = {
 			'start_construction_project': player_event_handlers.start_construction_project,
-			'remove_construction_project': player_event_handlers.remove_construction_project
 		}
 
 	def generate_mock_game(self):
@@ -23,7 +24,7 @@ class PlayerWorld:
 		print(self.galaxy.world_objects['stars']['0'].planets)
 
 	def handle_player_input(self, command):
-		return self.player_command_mapping[command.name](self.galaxy, *command.args)
+		pass
 
 	def game_loop(self):
 		game_loop.game_loop(self.galaxy)
@@ -31,6 +32,9 @@ class PlayerWorld:
 	# GETTERS5
 	def get_all_objects(self):
 		return self.galaxy.world_objects
+
+	def get_construction_costs(self):
+		return construction_constants
 
 	def get_canvas_size(self):
 		return self.galaxy.get_galaxy_creation_parameters('size_of_canvas')

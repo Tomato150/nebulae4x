@@ -281,14 +281,9 @@
         $(document).ready(function () {
             var world = world_object;
 
-            var mouse_handlers = handler_object;
-
-            var handlers = handler_object;
-
-            function Command(name, args) {
-                this.name = name;
-                this.args = args;
-            }
+            var mouse_handlers = mouse_handlers_object;
+            var general_handlers = general_handlers_object;
+            var construction_handlers = construction_handlers_object;
 
             $.ajax({
                 type: 'GET',
@@ -296,7 +291,9 @@
                 dataType: 'json',
                 contentType: 'application/json',
                 success: function (server_data) {
+                    // TODO Include construction costs into server data sent.
                     world.init(server_data);
+                    construction_handlers._init(server_data['construction_costs'])
                 },
                 error: function (xhr, ajaxOptions, thrownError) {alert('Error: Unable to load objects from server: ' + thrownError);}
             });
@@ -305,71 +302,34 @@
             $(document).on('mousewheel', '#canvas', function (e) {mouse_handlers.mouse_scroll(e, world);});
 
             // Dragging Canvas
-            $(document).on('mousedown', '#canvas', function (e) {mouse_handlers.canvas_mouse_click(e, world);});
+            $(document).on('mousedown', '#canvas', function (e) {mouse_handlers.canvas_mouse_click(world);});
 
             // Double click to select planet.
             $(document).on('dblclick', '#canvas', function (e) {mouse_handlers.galaxy_double_click(e, world);});
 
             // Mouse move on canvas.
-            $(document).on('mousemove', function (e) {mouse_handlers.mouse_move(e, world);} );
+            $(document).on('mousemove', function (e) {mouse_handlers.mouse_move(e, world);});
 
             // Releasing mouse button
-            $(document).on('mouseup', function (e) {mouse_handlers.mouse_click_up(e, world);} );
+            $(document).on('mouseup', function (e) {mouse_handlers.mouse_click_up(world);});
 
-            // TODO Move all to separate files.
             // Main menu header button
-            $(document).on('click', '#main-menu-div-toggle', function (e) {
-                e.preventDefault();
-                var main_menu = $('#main-menu-div');
-                if (main_menu.attr('hidden')) {
-                    main_menu.removeAttr('hidden')
-                } else {
-                    main_menu.attr({'hidden': ''})
-                }
-            });
+            $(document).on('click', '#main-menu-div-toggle', function (e) {general_handlers.main_menu_toggle(e)});
 
             // Cross button for main menu
-            $(document).on('click', '#main-menu-close', function () {
-                $('#main-menu-div').attr({'hidden': ''})
-            });
+            $(document).on('click', '#main-menu-close', function () {general_handlers.main_menu_close(e)});
 
             // Set which view is visible
-            $(document).on('click', '.navbar-main-menu-selectors', function (e) {
-                e.preventDefault();
-                var data_window_target = $(this).data('window-target');
-                world.set_menu_for(data_window_target)
-            });
+            $(document).on('click', '.navbar-main-menu-selectors', function (e) {general_handlers.set_main_menu_state(e, world, $(this).data('window-target'));});
 
             // Change galactic view
-            $(document).on('click', '.navbar-canvas-view-toggle', function (e) {
-                e.preventDefault();
-                var view_target = $(this).data('view-target');
-                world.set_view_for(view_target)
-            });
+            $(document).on('click', '.navbar-canvas-view-toggle', function (e) {general_handlers_object.set_canvas_view(e, world, $(this).data('view-target'))});
 
             // Create construction project
-            $(document).on('click', '#construction-project-creation', function (e) {
-                e.preventDefault();
-                var config = world.get_config();
-                var command = new Command('start_construction_project', [
-                    config.selected_colony.ids,
-                    [
-                        $('#construction-project-building').val().toLowerCase(),
-                        $('#construction-project-runs').val(),
-                        $('#construction-project-factories').val()
-                    ]
-                ]);
-                console.log(command);
-                world.post_commands_to_server(command);
-            });
+            $(document).on('click', '#construction-project-creation', function (e) {construction_handlers._create_construction_project(e, world)});
 
             // Right click
-            $(document).on('contextmenu', '#canvas', function (e) {
-                e.preventDefault();
-                var config = world.get_config();
-                console.log(Math.floor((config.container_pan_x + config.mouse_x) / config.scroll_factor - (config.canvas_size / 2)));
-                console.log(-Math.floor((config.container_pan_y + config.mouse_y) / config.scroll_factor - (config.canvas_size / 2)));
-            });
+            $(document).on('contextmenu', '#canvas', function (e) {general_handlers.custom_context_menu(e, world)});
 
             // Select a colony from sidebar
             $(document).on('click', '.colony-selector', function (e) {
@@ -387,10 +347,7 @@
             });
 
             // Select building from sidebar.
-            $(document).on('click', '.selectable-building', function (e) {
-                e.preventDefault();
-                $('#construction-project-building').val(($(this).text()));
-            });
+            $(document).on('click', '.selectable-building', function (e) {construction_handlers.select_building_for_construction(e, $(this).text())});
         });
     </script>
 </body>

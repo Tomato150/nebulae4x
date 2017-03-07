@@ -63,6 +63,16 @@ var world_object = (function () {
         'local_system_other_container': null  // Contains information about fleets and other occurrences
     };
 
+    function Command(name, target_object_ids, args) {
+        this.name = name;
+        this.target_object_ids = target_object_ids;
+        this.args = args;
+    }
+
+    function _create_command(name, target_object_ids, args) {
+        return new Command(name, target_object_ids, args)
+    }
+
     function _get_object_by_ids(object_type, object_ids, is_self) {
         if (is_self) {
             if (object_type == 'star') {
@@ -123,6 +133,12 @@ var world_object = (function () {
             config.empires[construction_project_ids['empire']].colonies[construction_project_ids['colony']]
                 .construction_projects[construction_project_id['self']] = construction_project_instance;
         }
+
+        config.player_empire = config.empires['0'];
+
+        // DEBUGGER CODE
+        config.selected_star = config.stars['0'];
+        config.selected_colony = config.player_empire.colonies['0'];
 
         _size_windows();
 
@@ -269,6 +285,7 @@ var world_object = (function () {
 
     return {
         init: _init,
+        create_command: _create_command,
         set_menu_for: _set_menu_for,
         set_view_for: _set_view_for,
         post_commands_to_server: _post_commands_to_server,

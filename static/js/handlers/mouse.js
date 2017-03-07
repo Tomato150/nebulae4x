@@ -9,6 +9,7 @@ var mouse_handlers_object = (function () {
         var old_scroll_factor = config.scroll_factor;
         var mouse_x = e.pageX;
         var mouse_y = e.pageY;
+
         if (e.originalEvent.wheelDelta >= 0) {
             // Scrolled up
             config.scroll_factor = Math.min(32, config.scroll_factor + 1);
@@ -24,6 +25,7 @@ var mouse_handlers_object = (function () {
                 config.container_pan_y -= ((config.container_pan_y + mouse_y) / (config.canvas_size * (config.scroll_factor + 1))) * config.canvas_size;
             }
         }
+
         config.galaxy_non_star_container.scale.x = config.scroll_factor;
         config.galaxy_non_star_container.scale.y = config.scroll_factor;
         config.galaxy_star_container.scale.x = config.scroll_factor / 32;
@@ -37,8 +39,8 @@ var mouse_handlers_object = (function () {
 
     function _canvas_mouse_click_down(e, world) {
         e.preventDefault();
-
         var config = world.get_config();
+
         // Left Mouse
         config.mouse_x = e.pageX;
         config.mouse_y = e.pageY;
@@ -63,8 +65,9 @@ var mouse_handlers_object = (function () {
         }
     }
 
-    function _canvas_double_click(e, world) {
+    function _canvas_double_click(world) {
         var config = world.get_config();
+
         console.log(Math.floor((config.container_pan_x + config.mouse_x) / config.scroll_factor - (config.canvas_size / 2)));
         console.log(-Math.floor((config.container_pan_y + config.mouse_y) / config.scroll_factor - (config.canvas_size / 2)));
 
@@ -87,6 +90,7 @@ var mouse_handlers_object = (function () {
 
     function _mouse_move(e, world) {
         var config = world.get_config();
+
         if (config.down) {
             config.moved = true;
             var newX = e.pageX;
@@ -103,8 +107,9 @@ var mouse_handlers_object = (function () {
         }
     }
 
-    function _mouse_click_up(e, world) {
+    function _mouse_click_up(world) {
         var config = world.get_config();
+
         config.down = false;
         if (config.moved){
             config.moved = false;
