@@ -7,7 +7,7 @@ class TerrestrialBody:
 		self.ids = {
 			'self': planet_id,
 
-			'star': star_instance.id
+			'star': star_instance.ids['self']
 		}
 
 		self.orbit_index = orbit_index  # 0, 1, 2 ... n

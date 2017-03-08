@@ -10,7 +10,7 @@ class Colony:
 			'star': planet_instance.ids['star'],
 			'planet': planet_instance.ids['self'],
 
-			'empire': empire_instance.id
+			'empire': empire_instance.ids['self']
 		}
 
 		# Colony Type information

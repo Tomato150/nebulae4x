@@ -304,22 +304,22 @@
             $(document).on('mousewheel', '#canvas', function (e) {mouse_handlers.mouse_scroll(e, world);});
 
             // Dragging Canvas
-            $(document).on('mousedown', '#canvas', function (e) {mouse_handlers.canvas_mouse_click(world);});
+            $(document).on('mousedown', '#canvas', function (e) {mouse_handlers.canvas_mouse_click_down(e, world);});
 
             // Double click to select planet.
-            $(document).on('dblclick', '#canvas', function (e) {mouse_handlers.galaxy_double_click(e, world);});
+            $(document).on('dblclick', '#canvas', function () {mouse_handlers.canvas_double_click(world);});
 
             // Mouse move on canvas.
             $(document).on('mousemove', function (e) {mouse_handlers.mouse_move(e, world);});
 
             // Releasing mouse button
-            $(document).on('mouseup', function (e) {mouse_handlers.mouse_click_up(world);});
+            $(document).on('mouseup', function () {mouse_handlers.mouse_click_up(world);});
 
             // Main menu header button
             $(document).on('click', '#main-menu-div-toggle', function (e) {general_handlers.main_menu_toggle(e)});
 
             // Cross button for main menu
-            $(document).on('click', '#main-menu-close', function () {general_handlers.main_menu_close(e)});
+            $(document).on('click', '#main-menu-close', function (e) {general_handlers.main_menu_close(e)});
 
             // Set which view is visible
             $(document).on('click', '.navbar-main-menu-selectors', function (e) {general_handlers.set_main_menu_state(e, world, $(this).data('window-target'));});
@@ -345,7 +345,7 @@
                 var colony = config.empires['0'].colonies[colony_id];
                 config.selected_colony = colony;
 
-                world.set_menu_for('colony')
+                world.set_menu_for('colony-menu')
             });
 
             // Select building from sidebar.

@@ -101,11 +101,11 @@ var world_object = (function () {
     }
 
     // OPTIMIZE Can fix the empire/plural parameter.
-    function _create_new_objects(objects, object_type, object_type_plural, parents) {
+    function _create_new_objects(objects, object_type_plural, parents) {
         for (var id in objects) {
             var instance = objects[id];
             var instance_ids = instance.ids;
-            if (object_type != 'empire') {
+            if (object_type_plural != 'empires') {
                 for (var parent in parents) {
                     _get_object_by_ids(parent, instance_ids, false)[object_type_plural][instance_ids['self']] = instance
                 }
@@ -125,10 +125,13 @@ var world_object = (function () {
     }
 
     // TODO MAKE A DELETE FUNCTION.
-    function _delete_existing_objects(objects, object_type) {
+    function _delete_existing_objects(objects, object_type_plural, parents) {
         for (var id in objects) {
-            var instance = objects[ids];
-            var instance_ids = instance.ids
+            var instance = objects[id];
+            var instance_ids = instance.ids;
+            for (var parent in parents) {
+                delete _get_object_by_ids(parent, instance_ids, false)[object_type_plural][instance_ids['self']]
+            }
         }
     }
 
@@ -289,17 +292,17 @@ var world_object = (function () {
             dataType: 'json',
             contentType: 'application/json',
             success: function (server_data) {
-                // Fill in for the refresh shit.
+                // Done with so many lines of code to ensure manual and easily readable order of updates to ensure no clashes.
 
                 // LOOPS FOR CREATING NEW OBJECTS
                 // OPTIMIZE can fix up here as well.
-                _create_new_objects(server_data['create']['planets'], 'planet', 'planets', ['star']);
+                _create_new_objects(server_data['create']['planets'], 'planets', ['star']);
 
-                _create_new_objects(server_data['create']['empire'], 'empire', 'empires', []);
+                _create_new_objects(server_data['create']['empire'], 'empires', []);
 
-                _create_new_objects(server_data['create']['colonies'], 'colony', 'colonies', ['empire', 'planet']);
+                _create_new_objects(server_data['create']['colonies'], 'colonies', ['empire', 'planet']);
 
-                _create_new_objects(server_data['create']['construction_projects'], 'construction_project', 'construction_projects', ['colony']);
+                _create_new_objects(server_data['create']['construction_projects'], 'construction_projects', ['colony']);
 
 
 
@@ -314,6 +317,7 @@ var world_object = (function () {
                 _update_existing_objects(server_data['update']['construction_projects'], 'construction_project', []);
 
                 // TODO LOOPS FOR DELETING OBJECTS.
+
             },
             error: function (xhr, ajaxOptions, thrownError) {alert('Error: Unable to issue command to server: ' + thrownError);}
         });

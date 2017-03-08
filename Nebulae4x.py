@@ -82,7 +82,7 @@ def get_stars():
 
 @app.route('/commands_to_server', methods=['POST'])
 def commands_to_server():
-	# TODO completely fix the player command system
+	# DONE serverside fix of the player command system
 	client_data = request.get_json()
 
 	return player_world.handle_player_input(client_data['name'], client_data['target_object_ids'], client_data['args'])
