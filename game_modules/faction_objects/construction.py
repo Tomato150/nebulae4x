@@ -1,5 +1,8 @@
+from game_data.constants import construction_constants
+
+
 class ConstructionProject:
-	def __init__(self, project_id, project_info, project_runs, num_of_factories, project_cost, colony_instance, **kwargs):
+	def __init__(self, project_id, project_building, project_runs, num_of_factories, colony_instance, **kwargs):
 		# Parent Id's
 		self.ids = {
 			'self': project_id,
@@ -11,8 +14,8 @@ class ConstructionProject:
 		}
 
 		# Project Info
-		self.project_info = project_info  # What you are building
-		self.project_cost = project_cost  # Individual resource cost per resource
+		self.project_building = project_building  # What you are building
+		self.project_cost = construction_constants.building_costs[project_building]  # Individual resource cost per resource
 
 		currently_completed = {}
 		for key in self.project_cost:
@@ -63,7 +66,7 @@ class ConstructionProject:
 			for key in self.currently_completed:
 				self.currently_completed[key] = 0
 			self.project_runs -= 1
-			colony.add_buildings(self.project_info, galaxy)
+			colony.add_buildings(self.project_building, galaxy)
 			return True
 		else:
 			return False

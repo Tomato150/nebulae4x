@@ -12,7 +12,7 @@ class Galaxy:
 	def __init__(self):
 		# Constants to change to fuck with the shape of the galaxy
 		self.galaxy_creation_parameters = {
-			'num_of_stars': 5000,
+			'num_of_stars': 50000,
 			'num_of_arms': 6,
 			'arms_offset_max': 0.5,
 			'rotation_factor': 3,
@@ -162,7 +162,7 @@ class Galaxy:
 	def create_new_empire(self, name):
 		empire = empires.Empire(str(self.world_objects_id['empires']), name, self)
 		self.world_objects_id['empires'] += 1
-		self.world_objects['empires'][empire.id] = empire
+		self.world_objects['empires'][empire.ids['self']] = empire
 		return empire
 
 	def create_new_colony(self, name, planet_instance, empire_instance):
@@ -170,8 +170,8 @@ class Galaxy:
 		self.world_objects_id['colonies'] += 1
 		return colony
 
-	def create_new_construction_project(self, project_details, project_cost, colony_instance):
-		construction_project = construction.ConstructionProject(str(self.world_objects_id['construction_projects']), *project_details, project_cost, colony_instance)
+	def create_new_construction_project(self, project_building, project_runs, num_of_factories, colony_instance):
+		construction_project = construction.ConstructionProject(str(self.world_objects_id['construction_projects']), project_building, project_runs, num_of_factories, colony_instance)
 		self.world_objects_id['construction_projects'] += 1
 		return construction_project
 
@@ -187,7 +187,7 @@ class Galaxy:
 				return self.world_objects['empires'][object_ids['empire']].colonies[object_ids['self']]
 			elif object_type == 'construction_project':
 				return self.world_objects['empires'][object_ids['empire']].colonies[object_ids['self']].construction_projects[object_ids['self']]
-		else:
+		elif not is_self:
 			if object_type == 'star':
 				return self.world_objects['stars'][object_ids['star']]
 			elif object_type == 'planet':

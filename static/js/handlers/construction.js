@@ -25,7 +25,7 @@ var construction_handlers_object = (function () {
             'start_construction_project',
             config.selected_colony.ids,
             {
-                'info': $('#construction-project-building').val().toLowerCase(),
+                'building': $('#construction-project-building').val().toLowerCase(),
                 'runs': $('#construction-project-runs').val(),
                 'num_of_factories': $('#construction-project-factories').val()
             }

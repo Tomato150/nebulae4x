@@ -23,8 +23,8 @@ class PlayerWorld:
 
 		print(self.galaxy.world_objects['stars']['0'].planets)
 
-	def handle_player_input(self, command):
-		pass
+	def handle_player_input(self, name, target_object_ids, args):
+		return self.player_command_mapping[name](self.galaxy, target_object_ids, args)
 
 	def game_loop(self):
 		game_loop.game_loop(self.galaxy)
@@ -34,7 +34,7 @@ class PlayerWorld:
 		return self.galaxy.world_objects
 
 	def get_construction_costs(self):
-		return construction_constants
+		return construction_constants.building_costs
 
 	def get_canvas_size(self):
 		return self.galaxy.get_galaxy_creation_parameters('size_of_canvas')

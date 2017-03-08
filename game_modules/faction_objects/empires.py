@@ -1,7 +1,7 @@
 class Empire:
 	def __init__(self, empire_id, name, galaxy, **kwargs):
 		# Empire name and identification
-		self.id = empire_id
+		self.ids = {'self': empire_id}
 		self.name = name
 
 		# Empire modifiers and stats
@@ -17,7 +17,7 @@ class Empire:
 
 		self.__dict__.update(kwargs)
 
-		galaxy.world_objects['empires'][self.id] = self
+		galaxy.world_objects['empires'][self.ids['self']] = self
 
 	# GETTERS
 	def get_player_empire(self):
@@ -32,15 +32,8 @@ class Empire:
 	def get_fleets(self):
 		return self.fleets
 
-	# SETTERS
-	def add_fleet(self, fleet_id):
-		self.fleets.append(fleet_id)
-
-	def add_colony(self, colony_id):
-		self.colonies.append(colony_id)
-
 	def serialize(self):
 		dictionary = dict(self.__dict__)
-		dictionary['colonies'] = {}
-		dictionary['fleets'] = {}
+		dictionary['colonies'] = dict()
+		dictionary['fleets'] = dict()
 		return dictionary
