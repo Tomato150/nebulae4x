@@ -1,6 +1,7 @@
 class TerrestrialBody:
-	def __init__(self, planet_id, name, orbit_index, star_instance, **kwargs):
+	def __init__(self, planet_id, name, orbit_index, star_instance, galaxy, **kwargs):
 		# Planet Location and General Information
+		self.galaxy = galaxy
 		self.name = name
 
 		# Planet parent body relevant information
@@ -38,7 +39,8 @@ class TerrestrialBody:
 
 	def serialize(self):
 		dictionary = dict(self.__dict__)
-		dictionary['colonies'] = {}
+		dictionary['colonies'] = dict()
+		del dictionary['galaxy']
 		return dictionary
 
 	# GETTERS

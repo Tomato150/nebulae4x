@@ -8,6 +8,7 @@ import random
 class Star:
 	def __init__(self, star_id, x, y, galaxy, **kwargs):
 		# System General information
+		self.galaxy = galaxy
 		self.ids = {'self': star_id}
 		self.name = utility_functions.name_creator(random.randint(2, 3), random.randint(3, 5), random.randint(1, 2))
 
@@ -40,5 +41,6 @@ class Star:
 
 	def serialize(self):
 		dictionary = dict(self.__dict__)
-		dictionary['planets'] = {}
+		dictionary['planets'] = dict()
+		del dictionary['galaxy']
 		return dictionary

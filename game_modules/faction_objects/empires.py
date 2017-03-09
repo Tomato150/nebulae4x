@@ -1,6 +1,7 @@
 class Empire:
 	def __init__(self, empire_id, name, galaxy, **kwargs):
 		# Empire name and identification
+		self.galaxy = galaxy
 		self.ids = {'self': empire_id}
 		self.name = name
 
@@ -19,21 +20,9 @@ class Empire:
 
 		galaxy.world_objects['empires'][self.ids['self']] = self
 
-	# GETTERS
-	def get_player_empire(self):
-		return self
-
-	def get_modifiers(self):
-		return self.modifiers
-
-	def get_colonies(self):
-		return self.colonies
-
-	def get_fleets(self):
-		return self.fleets
-
 	def serialize(self):
 		dictionary = dict(self.__dict__)
 		dictionary['colonies'] = dict()
 		dictionary['fleets'] = dict()
+		del dictionary['galaxy']
 		return dictionary

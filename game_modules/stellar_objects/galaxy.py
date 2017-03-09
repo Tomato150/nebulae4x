@@ -1,5 +1,5 @@
 from game_modules.stellar_objects import stars, planets
-from game_modules.faction_objects import empires, colonies, construction
+from game_modules.faction_objects import empires, colonies, construction_project
 
 from game_modules import utility_functions
 
@@ -155,7 +155,7 @@ class Galaxy:
 	# All will map the instance to the desired object/dict.
 	def create_new_planet(self, star_instance, star_name, orbit_index):
 		planet_name = star_name + ' ' + utility_functions.toRoman(orbit_index + 1)
-		planet = planets.TerrestrialBody(str(self.world_objects_id['planets']), planet_name, orbit_index, star_instance)
+		planet = planets.TerrestrialBody(str(self.world_objects_id['planets']), planet_name, orbit_index, star_instance, self)
 		self.world_objects_id['planets'] += 1
 		return planet
 
@@ -166,12 +166,12 @@ class Galaxy:
 		return empire
 
 	def create_new_colony(self, name, planet_instance, empire_instance):
-		colony = colonies.Colony(str(self.world_objects_id['colonies']), name, planet_instance, empire_instance)
+		colony = colonies.Colony(str(self.world_objects_id['colonies']), name, planet_instance, empire_instance, self)
 		self.world_objects_id['colonies'] += 1
 		return colony
 
 	def create_new_construction_project(self, project_building, project_runs, num_of_factories, colony_instance):
-		construction_project = construction.ConstructionProject(str(self.world_objects_id['construction_projects']), project_building, project_runs, num_of_factories, colony_instance)
+		construction_project = construction_project.ConstructionProject(str(self.world_objects_id['construction_projects']), project_building, project_runs, num_of_factories, colony_instance, self)
 		self.world_objects_id['construction_projects'] += 1
 		return construction_project
 

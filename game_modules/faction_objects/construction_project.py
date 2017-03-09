@@ -1,9 +1,11 @@
 from game_data.constants import construction_constants
+from game_modules.faction_objects import colonies
 
 
 class ConstructionProject:
-	def __init__(self, project_id, project_building, project_runs, num_of_factories, colony_instance, **kwargs):
+	def __init__(self, project_id, project_building, project_runs, num_of_factories, colony_instance, galaxy, **kwargs):
 		# Parent Id's
+		self.galaxy = galaxy
 		self.ids = {
 			'self': project_id,
 			'star': colony_instance.parent_ids['star'],
@@ -56,7 +58,7 @@ class ConstructionProject:
 
 		return remainder_CP, available_for_extra
 
-	def _check_for_built(self, colony, galaxy):
+	def _check_for_built(self, colony):
 		self.currently_completed['total'] = 0
 		for key, value in self.currently_completed.items():
 			if key != 'total':
@@ -66,14 +68,14 @@ class ConstructionProject:
 			for key in self.currently_completed:
 				self.currently_completed[key] = 0
 			self.project_runs -= 1
-			colony.add_buildings(self.project_building, galaxy)
+			colony.add_buildings(self.project_building)
 			return True
 		else:
 			return False
 
-	def construction_tick(self, galaxy):
+	def construction_tick(self):
 		# Apply what you can, get remainders
-		empire_instance = galaxy.world_objects[self.ids['empire']]
+		empire_instance = self.galaxy.world_objects[self.ids['empire']]
 		colony_instance = empire_instance[self.ids['colony']]
 
 		while True:
@@ -96,7 +98,7 @@ class ConstructionProject:
 						available_for_extra_list.append(material)
 
 			# Check if it is built, then apply build points again if needed.
-			if not self._check_for_built(colony_instance, galaxy):
+			if not self._check_for_built(colony_instance):
 				break
 
 		# Use the remainders
@@ -114,10 +116,12 @@ class ConstructionProject:
 				if available_for_extra:
 					available_for_extra_list_new.append(material)
 			available_for_extra_list = available_for_extra_list_new
-			self._check_for_built(colony_instance, galaxy)
+			self._check_for_built(colony_instance)
 
 	def remove_construction(self, galaxy, colony_ids):
 		pass
 
 	def serialize(self):
-		return dict(self.__dict__)
+		dictionary = dict(self.__dict__)
+		del dictionary['galaxy']
+		return dictionary

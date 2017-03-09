@@ -1,4 +1,4 @@
-from game_modules.faction_objects import empires, colonies, construction
+from game_modules.faction_objects import empires, colonies, construction_project
 
 from game_data.constants import construction_constants
 

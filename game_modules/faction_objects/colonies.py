@@ -1,6 +1,7 @@
 class Colony:
-	def __init__(self, colony_id, name, planet_instance, empire_instance, **kwargs):
+	def __init__(self, colony_id, name, planet_instance, empire_instance, galaxy, **kwargs):
 		# Colony Location and General information
+		self.galaxy = galaxy
 		self.name = name
 
 		#Parent ID's
@@ -45,24 +46,30 @@ class Colony:
 			galaxy.construction_projects[construction_project].tick_construction(empire, self)
 
 	# SETTERS
-	def add_buildings(self, building, galaxy):
+	def add_buildings(self, building):
 		if type(building) == str:
 			self.buildings[building] += 1
 		else:
-			galaxy.add_objects({'installations': building})
+			self.galaxy.add_objects({'installations': building})
 			self.installations[building.name] = building.id
 
 	def serialize(self):
 		dictionary = dict(self.__dict__)
-		dictionary['construction_projects'] = {}
-		dictionary['installations'] = {}
+		dictionary['construction_projects'] = dict()
+		dictionary['installations'] = dict()
+		del dictionary['galaxy']
 		return dictionary
 
 
 class Installation:
-	def __init__(self, name, installation_id):
+	def __init__(self, name, installation_id, galaxy):
 		# General information and identification of the installation.
+		self.galaxy = galaxy
 		self.name = name
 		self.id = installation_id
 
 		self.stats = {}
+
+	def serialize(self):
+		dictionary = dict(self.__dict__)
+		del dictionary['galaxy']
