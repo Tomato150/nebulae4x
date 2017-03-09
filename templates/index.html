@@ -294,7 +294,7 @@
                 contentType: 'application/json',
                 success: function (server_data) {
                     // DONE Include construction costs into server data sent.
-                    world.init(server_data);
+                    world.init(server_data, world);
                     construction_handlers._init(server_data['construction_costs'])
                 },
                 error: function (xhr, ajaxOptions, thrownError) {alert('Error: Unable to load objects from server: ' + thrownError);}

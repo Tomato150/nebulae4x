@@ -34,11 +34,6 @@ class Star:
 		for i in range(0, amount):
 			galaxy.create_new_planet(self, self.name, len(self.planets))
 
-	# GETTERS:
-	def get_coordinates(self):
-		# [x, y]
-		return self.coordinates
-
 	def serialize(self):
 		dictionary = dict(self.__dict__)
 		dictionary['planets'] = dict()

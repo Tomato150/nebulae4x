@@ -19,13 +19,37 @@ function Colony_object (name, ids, colony_type, buildings, installations, constr
 
     var config = this.world.get_config();
 
-    config.empires[this.ids['empire']].colonies[this.ids['self']] = this;
-    config.stars[this.ids['star']].planets[this.ids['planet']].colonies[this.ids['self']] = this;
+    var parent_empire = config.empires[this.ids['empire']];
+    var parent_planet = config.stars[this.ids['star']].planets[this.ids['planet']];
+    parent_empire.colonies[this.ids['self']] = this;
+    parent_planet.colonies[this.ids['self']] = this;
+
+    this.parent_empire = parent_empire;
+    this.parent_planet = parent_planet;
 }
 
 Colony_object.prototype.delete_instance = function () {
-    var config = this.world.get_config();
+    delete this.parent_empire.colonies[this.ids['self']];
+    delete this.parent_planet.colonies[this.ids['self']];
 
-    delete config.empires[this.ids['empire']].colonies[this.ids['self']];
-    delete config.stars[this.ids['star']].planets[this.ids['planet']].colonies[this.ids['self']];
+    for (var installation_id in this.installations) {
+        delete this.installations[installation_id].parent_colony;
+    }
+
+    for (var construction_project in this.construction_projects) {
+        delete this.construction_projects[construction_project].parent_colony;
+    }
 };
+
+function _create_colony(colony_instance, world) {
+    new Colony_object(
+        colony_instance['name'],
+        colony_instance.ids,
+        colony_instance.colony_type,
+        colony_instance.buildings,
+        {},
+        {},
+        colony_instance.resource_storage,
+        world
+    )
+}

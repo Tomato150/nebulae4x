@@ -100,41 +100,6 @@ var world_object = (function () {
         }
     }
 
-    // OPTIMIZE Can fix the empire/plural parameter.
-    function _create_new_objects(objects, object_type_plural, parents) {
-        for (var id in objects) {
-            var instance = objects[id];
-            var instance_ids = instance.ids;
-            if (object_type_plural != 'empires') {
-                for (var parent in parents) {
-                    _get_object_by_ids(parent, instance_ids, false)[object_type_plural][instance_ids['self']] = instance
-                }
-            } else {
-                config.empires[instance_ids['self']] = instance
-            }
-        }
-    }
-
-    function _update_existing_objects(objects, object_type, children) {
-        for (var id in objects) {
-            var instance = objects[id];
-            var instance_ids = instance.ids;
-            for (var child in children) {delete instance[child]}
-            $.extend(_get_object_by_ids(object_type, instance_ids, true) , instance);
-        }
-    }
-
-    // TODO MAKE A DELETE FUNCTION.
-    function _delete_existing_objects(objects, object_type_plural, parents) {
-        for (var id in objects) {
-            var instance = objects[id];
-            var instance_ids = instance.ids;
-            for (var parent in parents) {
-                delete _get_object_by_ids(parent, instance_ids, false)[object_type_plural][instance_ids['self']]
-            }
-        }
-    }
-
     function _size_windows() {
         config.main_menu_div.height($(window).height() - 58 - 40).width(($(window).width() - 40))
             .css({'left': '20px', 'top': '78px'});
@@ -145,33 +110,30 @@ var world_object = (function () {
         config.canvas.attr(attribute_list);
     }
 
-    function _init(server_data) {
-        config.empires = server_data['empires'];
-        config.stars = server_data['stars'];
+    function _init(server_data, world) {
+        for (var star_id in server_data['stars']) {
+            _create_star(server_data['stars'][star_id], world); // TODO CHECK WITH DAD ON 'this'
+        }
+
+        for (var empire_id in server_data['empires']) {
+            _create_empire(server_data['empires'][empire_id], world);
+        }
 
         for (var planet_id in server_data['planets']) {
-            var planet_instance = server_data['planets'][planet_id];
-            var planet_ids = planet_instance.ids;
-            config.stars[planet_ids['star']].planets[planet_ids['self']] = planet_instance;
+            _create_planet(server_data['planets'][planet_id], world);
         }
 
         for (var colony_id in server_data['colonies']) {
-            var colony_instance = server_data['colonies'][colony_id];
-            var colony_ids = colony_instance.ids;
-            config.stars[colony_ids['star']].planets[colony_ids['planet']].colonies[colony_ids['self']] = colony_instance;
-            config.empires[colony_ids['empire']].colonies[colony_ids['self']] = colony_instance;
+            _create_colony(server_data['colonies'][colony_id], world);
         }
 
         for (var construction_project_id in server_data['construction_projects']) {
-            var construction_project_instance = server_data['construction_projects'][construction_project_id];
-            var construction_project_ids = colony_instance.ids;
-            config.empires[construction_project_ids['empire']].colonies[construction_project_ids['colony']]
-                .construction_projects[construction_project_id['self']] = construction_project_instance;
+            _create_construction_project(server_data['construction_projects'][construction_project_id], world);
+
         }
 
-        config.player_empire = config.empires['0'];
-
         // DEBUGGER CODE
+        config.player_empire = config.empires['0'];
         config.selected_star = config.stars['0'];
         config.selected_colony = config.player_empire.colonies['0'];
 
@@ -292,32 +254,30 @@ var world_object = (function () {
             dataType: 'json',
             contentType: 'application/json',
             success: function (server_data) {
-                // Done with so many lines of code to ensure manual and easily readable order of updates to ensure no clashes.
+                // TODO Make the refresh function once more.
+                // CREATE FUNCTIONS
+                for (var star_id in server_data['create']['stars']) {
+                    _create_star(server_data['create']['stars'][star_id], world); // TODO CHECK WORLD WITH DAD.
+                }
 
-                // LOOPS FOR CREATING NEW OBJECTS
-                // OPTIMIZE can fix up here as well.
-                _create_new_objects(server_data['create']['planets'], 'planets', ['star']);
+                for (var planet_id in server_data['create']['planets']) {
+                    _create_star(server_data['create']['planets'][planet_id], world);
+                }
 
-                _create_new_objects(server_data['create']['empire'], 'empires', []);
+                // UPDATE FUNCTIONS
 
-                _create_new_objects(server_data['create']['colonies'], 'colonies', ['empire', 'planet']);
+                // DELETE FUNCTIONS
+                for (var empire_id in server_data['delete']['empires']) {
+                    _get_object_by_ids('empire', server_data['delete']['empires'][empire_id].ids, true).delete_instance();
+                }
 
-                _create_new_objects(server_data['create']['construction_projects'], 'construction_projects', ['colony']);
+                for (var colony_id in server_data['delete']['colonies']) {
+                    _get_object_by_ids('colony', server_data['delete']['colonies'][colony_id].ids, true).delete_instance();
+                }
 
-
-
-                // LOOPS FOR EXTENDING/UPDATING CURRENT OBJECTS.
-                _update_existing_objects(server_data['update']['stars'], 'star', ['planets']);
-                _update_existing_objects(server_data['update']['planets'], 'planet', ['colonies']);
-
-                _update_existing_objects(server_data['update']['empires'], 'empire', ['colonies']);
-
-                _update_existing_objects(server_data['update']['colonies'], 'colony', ['construction_projects']);
-
-                _update_existing_objects(server_data['update']['construction_projects'], 'construction_project', []);
-
-                // TODO LOOPS FOR DELETING OBJECTS.
-
+                for (var construction_project_id in server_data['delete']['construction_projects']) {
+                    _get_object_by_ids('construction_project', server_data['delete']['construction_projects'][construction_project_id].ids, true).delete_instance();
+                }
             },
             error: function (xhr, ajaxOptions, thrownError) {alert('Error: Unable to issue command to server: ' + thrownError);}
         });

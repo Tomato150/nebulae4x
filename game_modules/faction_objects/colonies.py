@@ -4,7 +4,9 @@ class Colony:
 		self.galaxy = galaxy
 		self.name = name
 
-		#Parent ID's
+		# Parents
+		self.parent_empire = empire_instance
+		self.parent_planet = planet_instance
 		self.ids = {
 			'self': colony_id,
 
@@ -73,3 +75,6 @@ class Installation:
 	def serialize(self):
 		dictionary = dict(self.__dict__)
 		del dictionary['galaxy']
+		del dictionary['parent_empire']
+		del dictionary['parent_planet']
+		return dictionary

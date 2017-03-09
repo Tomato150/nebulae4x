@@ -1,10 +1,14 @@
+from game_modules.stellar_objects import stars, galaxy as galaxy_file
+
 class TerrestrialBody:
-	def __init__(self, planet_id, name, orbit_index, star_instance, galaxy, **kwargs):
+	def __init__(self, planet_id, name, orbit_index, star_instance: stars.Star, galaxy: galaxy_file.Galaxy, **kwargs):
 		# Planet Location and General Information
 		self.galaxy = galaxy
 		self.name = name
 
-		# Planet parent body relevant information
+		# Parents
+		self.parent_star = star_instance
+
 		self.ids = {
 			'self': planet_id,
 
@@ -41,12 +45,5 @@ class TerrestrialBody:
 		dictionary = dict(self.__dict__)
 		dictionary['colonies'] = dict()
 		del dictionary['galaxy']
+		del dictionary['parent_star']
 		return dictionary
-
-	# GETTERS
-	def get_colonies(self):
-		return self.colonies
-
-	# SETTERS
-	def add_colony(self, colony_id):
-		self.colonies.append(colony_id)

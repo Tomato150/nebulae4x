@@ -4,8 +4,10 @@ from game_modules.faction_objects import colonies
 
 class ConstructionProject:
 	def __init__(self, project_id, project_building, project_runs, num_of_factories, colony_instance, galaxy, **kwargs):
-		# Parent Id's
+		# Parents
 		self.galaxy = galaxy
+		self.parent_colony = colony_instance
+
 		self.ids = {
 			'self': project_id,
 			'star': colony_instance.parent_ids['star'],
@@ -124,4 +126,5 @@ class ConstructionProject:
 	def serialize(self):
 		dictionary = dict(self.__dict__)
 		del dictionary['galaxy']
+		del dictionary['parent_colony']
 		return dictionary
