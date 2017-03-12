@@ -1,7 +1,5 @@
-from game_modules.stellar_objects import stars, galaxy as galaxy_file
-
 class TerrestrialBody:
-	def __init__(self, planet_id, name, orbit_index, star_instance: stars.Star, galaxy: galaxy_file.Galaxy, **kwargs):
+	def __init__(self, planet_id, name, orbit_index, star_instance, galaxy, **kwargs):
 		# Planet Location and General Information
 		self.galaxy = galaxy
 		self.name = name

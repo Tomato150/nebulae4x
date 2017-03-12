@@ -112,7 +112,7 @@ var world_object = (function () {
 
     function _init(server_data, world) {
         for (var star_id in server_data['stars']) {
-            _create_star(server_data['stars'][star_id], world); // TODO CHECK WITH DAD ON 'this'
+            _create_star(server_data['stars'][star_id], world);
         }
 
         for (var empire_id in server_data['empires']) {
@@ -244,7 +244,7 @@ var world_object = (function () {
         return config;
     }
 
-    function _post_commands_to_server(command) {
+    function _post_commands_to_server(command, world) {
         $.ajax({
             type: 'POST',
             url: '/commands_to_server',
@@ -254,29 +254,76 @@ var world_object = (function () {
             dataType: 'json',
             contentType: 'application/json',
             success: function (server_data) {
-                // TODO Make the refresh function once more.
+                // DONE Make the refresh function once more.
                 // CREATE FUNCTIONS
-                for (var star_id in server_data['create']['stars']) {
-                    _create_star(server_data['create']['stars'][star_id], world); // TODO CHECK WORLD WITH DAD.
+                for (var create_star_id in server_data['create']['stars']) {
+                    _create_star(server_data['create']['stars'][create_star_id], world);
                 }
 
-                for (var planet_id in server_data['create']['planets']) {
-                    _create_star(server_data['create']['planets'][planet_id], world);
+                for (var create_planet_id in server_data['create']['planets']) {
+                    _create_star(server_data['create']['planets'][create_planet_id], world);
+                }
+
+                for (var create_empire_id in server_data['create']['empires']) {
+                    _create_empire(server_data['create']['empires'][create_empire_id], world)
+                }
+
+                for (var create_colony_id in server_data['create']['colonies']) {
+                    _create_colony(server_data['create']['colonies'][create_colony_id], world)
+                }
+
+                for (var create_construction_id in server_data['create']['construction_projects']) {
+                    _create_construction_project(server_data['create']['construction_projects'][create_construction_id], world)
                 }
 
                 // UPDATE FUNCTIONS
 
+                for (var update_star_id in server_data['update']['stars']) {
+                    $.extend(
+                        _get_object_by_ids('star', server_data['update']['stars'][update_star_id].ids, true),
+                        server_data['update']['stars'][update_star_id]
+                    )
+                }
+
+                for (var update_planet_id in server_data['update']['planets']) {
+                    $.extend(
+                        _get_object_by_ids('planet', server_data['update']['planets'][update_planet_id].ids, true),
+                        server_data['update']['planets'][update_planet_id]
+                    )
+                }
+
+                for (var update_empire_id in server_data['update']['empires']) {
+                    $.extend(
+                        _get_object_by_ids('empire', server_data['update']['empires'][update_empire_id].ids, true),
+                        server_data['update']['empires'][update_empire_id]
+                    )
+                }
+
+                for (var update_colony_id in server_data['update']['colonies']) {
+                    $.extend(
+                        _get_object_by_ids('colony', server_data['update']['colonies'][update_colony_id].ids, true),
+                        server_data['update']['colonies'][update_colony_id]
+                    )
+                }
+
+                for (var update_construction_id in server_data['update']['construction_projects']) {
+                    $.extend(
+                        _get_object_by_ids('construction_project', server_data['update']['construction_projects'][update_construction_id].ids, true),
+                        server_data['update']['construction_projects'][update_construction_id]
+                    )
+                }
+
                 // DELETE FUNCTIONS
-                for (var empire_id in server_data['delete']['empires']) {
-                    _get_object_by_ids('empire', server_data['delete']['empires'][empire_id].ids, true).delete_instance();
+                for (var delete_empire_id in server_data['delete']['empires']) {
+                    _get_object_by_ids('empire', server_data['delete']['empires'][delete_empire_id].ids, true).delete_instance();
                 }
 
-                for (var colony_id in server_data['delete']['colonies']) {
-                    _get_object_by_ids('colony', server_data['delete']['colonies'][colony_id].ids, true).delete_instance();
+                for (var delete_colony_id in server_data['delete']['colonies']) {
+                    _get_object_by_ids('colony', server_data['delete']['colonies'][delete_colony_id].ids, true).delete_instance();
                 }
 
-                for (var construction_project_id in server_data['delete']['construction_projects']) {
-                    _get_object_by_ids('construction_project', server_data['delete']['construction_projects'][construction_project_id].ids, true).delete_instance();
+                for (var delete_construction_project_id in server_data['delete']['construction_projects']) {
+                    _get_object_by_ids('construction_project', server_data['delete']['construction_projects'][delete_construction_project_id].ids, true).delete_instance();
                 }
             },
             error: function (xhr, ajaxOptions, thrownError) {alert('Error: Unable to issue command to server: ' + thrownError);}

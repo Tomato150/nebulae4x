@@ -111,7 +111,7 @@ class Galaxy:
 				star_collision = False
 
 				for star_id, star in self.star_quadrants[str(quadrant_x)][str(quadrant_y)].items():
-					coordinates = star.get_coordinates()
+					coordinates = star.coordinates
 					if -1 <= coordinates[0] - star_x <= 1 and -1 <= coordinates[1] - star_y <= 1:
 						star_collision = True
 
@@ -124,7 +124,7 @@ class Galaxy:
 								if quad_y in range(bounds[0], bounds[1]) and not star_collision:
 
 									for star_id, star in self.star_quadrants[str(quad_x)][str(quad_y)].items():
-										coordinates = star.get_coordinates()
+										coordinates = star.coordinates
 										if -1 <= coordinates[0] - star_x <= 1 and -1 <= coordinates[1] - star_y <= 1:
 											star_collision = True
 
