@@ -60,7 +60,7 @@ class ConstructionProject:
 
 		return remainder_CP, available_for_extra
 
-	def _check_for_built(self, colony):
+	def _check_for_built(self):
 		self.currently_completed['total'] = 0
 		for key, value in self.currently_completed.items():
 			if key != 'total':
@@ -70,7 +70,7 @@ class ConstructionProject:
 			for key in self.currently_completed:
 				self.currently_completed[key] = 0
 			self.project_runs -= 1
-			colony.add_buildings(self.project_building)
+			self.parent_colony.add_buildings(self.project_building)
 			return True
 		else:
 			return False

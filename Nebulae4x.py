@@ -87,5 +87,11 @@ def commands_to_server():
 
 	return player_world.handle_player_input(client_data['name'], client_data['target_object_ids'], client_data['args'])
 
+
+# TODO Create AJAX for game loop handling.
+@app.route('/run_game_tick', methods=['GET'])
+def run_game_loop():
+	return player_world.run_game_loop()
+
 if __name__ == '__main__':
 	app.run(host='0.0.0.0')

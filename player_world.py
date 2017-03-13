@@ -40,7 +40,8 @@ class PlayerWorld:
 		return self.galaxy.get_galaxy_creation_parameters('size_of_canvas')
 
 	def run_game_loop(self):
-		pass
+		# TODO create game loop code
+		return game_loop.game_loop(self.galaxy)
 
 
 player_world = PlayerWorld()

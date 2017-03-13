@@ -1,4 +1,34 @@
+# TODO Create game loop structure and code
+def update_return_values(return_values, new_values):
+	for value in new_values:
+		return_values[new_values[value][0]] = new_values[value][1]
+
+
 def game_loop(galaxy):
+	return_values = {
+		'create': {
+			'stars': {},
+			'planets': {},
+			'empires': {},
+			'colonies': {},
+			'construction_projects': {}
+		},
+		'update': {
+			'stars': {},
+			'planets': {},
+			'empires': {},
+			'colonies': {},
+			'construction_projects': {}
+		},
+		'delete': {
+			'stars': {},
+			'planets': {},
+			'empires': {},
+			'colonies': {},
+			'construction_projects': {}
+		}
+	}
+
 	# Whole Game Events
 	for empire in galaxy.world_objects['empires']:
 		# Empire Wide Events
@@ -6,4 +36,6 @@ def game_loop(galaxy):
 			# Colony Wide Events
 			for construction_project_id, construction_project in colony.construction_projects.items():
 				# Construction Project Events
-				construction_project.construction_tick(galaxy)
+				update_return_values(return_values, construction_project.construction_tick())
+
+	return return_values

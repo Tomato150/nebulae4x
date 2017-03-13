@@ -344,6 +344,8 @@ var world_object = (function () {
         }
     }
 
+    // TODO create game loop.
+
     return {
         init: _init,
         create_command: _create_command,
