@@ -1,7 +1,9 @@
 # TODO Create game loop structure and code
 def update_return_values(return_values, new_values):
-	for value in new_values:
-		return_values[new_values[value][0]] = new_values[value][1]
+	if new_values is not None:
+		for major_key in new_values:
+			for minor_key in new_values[major_key]:
+				return_values.update(new_values[major_key][minor_key])
 
 
 def game_loop(galaxy):
